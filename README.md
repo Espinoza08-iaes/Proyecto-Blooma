@@ -7,3 +7,10 @@ Viene inspirado en la palabra inglesa **"bloom"**, que significa:
 - **Crecer**
 - **Entrar en una nueva etapa**
 - **Desarrollarse plenamente**
+
+---
+
+## Documentación del Proyecto
+
+- [Etapas de Desarrollo e Implementación](docs/desarrollo.md)
+- [Plan Integral: Seguridad y Mitigación de Fallos](docs/seguridad.md)
