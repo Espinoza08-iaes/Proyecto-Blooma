@@ -81,11 +81,11 @@ export default function MenopauseDashboard() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       
       {/* TRANSICIÓN STATUS CARD */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6 animate-fade-in-up delay-75 card-hover">
         <div className="absolute top-0 right-0 bg-brand-teal-500/10 h-32 w-32 rounded-full blur-3xl -z-10" />
 
         <div className="space-y-2">
-          <span className="inline-flex items-center gap-1.5 text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1.5 text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse-soft">
             <Sparkles className="h-3.5 w-3.5" />
             Estado Climaterio
           </span>
@@ -97,7 +97,7 @@ export default function MenopauseDashboard() {
           </p>
         </div>
 
-        <div className="bg-white/80 border border-brand-earth-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center min-w-[140px] shadow-sm flex-shrink-0">
+        <div className="bg-white/80 border border-brand-earth-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center min-w-[140px] shadow-sm flex-shrink-0 transition-transform duration-300 hover:scale-105">
           <span className="text-[10px] font-bold text-brand-earth-500 uppercase tracking-wider">Fase Biológica</span>
           <span className="text-sm font-extrabold text-brand-teal-700">
             {isPostmenopause ? 'Fase Completada' : 'Fase Activa'}
@@ -106,17 +106,17 @@ export default function MenopauseDashboard() {
       </section>
 
       {/* CBT / TCC CAROUSEL */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4 animate-fade-in-up delay-150">
         <div className="flex items-center justify-between border-b border-brand-earth-100 pb-3">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-brand-teal-600" />
+            <BookOpen className="h-5 w-5 text-brand-teal-600 animate-pulse-soft" />
             <h3 className="font-bold text-brand-earth-900">Acompañamiento Cognitivo (TCC)</h3>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={prevSlide}
-              className="p-1.5 rounded-lg border border-brand-earth-200 bg-white hover:bg-brand-earth-50 transition-all"
+              className="p-1.5 rounded-lg border border-brand-earth-200 bg-white hover:bg-brand-earth-50 transition-all active-press"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -126,15 +126,15 @@ export default function MenopauseDashboard() {
             <button
               type="button"
               onClick={nextSlide}
-              className="p-1.5 rounded-lg border border-brand-earth-200 bg-white hover:bg-brand-earth-50 transition-all"
+              className="p-1.5 rounded-lg border border-brand-earth-200 bg-white hover:bg-brand-earth-50 transition-all active-press"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Slide Content */}
-        <div className="min-h-[160px] flex flex-col justify-between space-y-3">
+        {/* Slide Content with key-based re-animation */}
+        <div key={activeSlide} className="min-h-[160px] flex flex-col justify-between space-y-3 animate-page-enter">
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase bg-brand-teal-50 text-brand-teal-700 px-2.5 py-0.5 rounded-full">
               {tccSlides[activeSlide].category}
@@ -155,9 +155,9 @@ export default function MenopauseDashboard() {
       </section>
 
       {/* OSTEOPOROSIS CHECKLIST */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4 animate-fade-in-up delay-200 card-hover">
         <div className="flex items-center gap-2 border-b border-brand-earth-100 pb-3">
-          <Bone className="h-5 w-5 text-brand-teal-600" />
+          <Bone className="h-5 w-5 text-brand-teal-600 animate-pulse-soft" />
           <h3 className="font-bold text-brand-earth-900">Prevención de Osteoporosis</h3>
         </div>
         <p className="text-xs text-brand-earth-600 leading-relaxed">
@@ -165,12 +165,12 @@ export default function MenopauseDashboard() {
         </p>
 
         <div className="space-y-2.5 pt-1">
-          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer">
+          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-earth-50/50 p-1.5 rounded-xl transition-colors">
             <input
               type="checkbox"
               checked={ostChecklist.calcium}
               onChange={() => handleCheckboxChange('calcium')}
-              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5"
+              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5 cursor-pointer"
             />
             <div>
               <span className="font-bold block">Consumo Diario de Calcio</span>
@@ -178,12 +178,12 @@ export default function MenopauseDashboard() {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer">
+          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-earth-50/50 p-1.5 rounded-xl transition-colors">
             <input
               type="checkbox"
               checked={ostChecklist.weightExercise}
               onChange={() => handleCheckboxChange('weightExercise')}
-              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5"
+              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5 cursor-pointer"
             />
             <div>
               <span className="font-bold block">Ejercicios de Fuerza o Resistencia</span>
@@ -191,12 +191,12 @@ export default function MenopauseDashboard() {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer">
+          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-earth-50/50 p-1.5 rounded-xl transition-colors">
             <input
               type="checkbox"
               checked={ostChecklist.sunExposure}
               onChange={() => handleCheckboxChange('sunExposure')}
-              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5"
+              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5 cursor-pointer"
             />
             <div>
               <span className="font-bold block">Exposición al Sol (Vitamina D)</span>
@@ -204,12 +204,12 @@ export default function MenopauseDashboard() {
             </div>
           </label>
 
-          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer">
+          <label className="flex items-start gap-3 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-earth-50/50 p-1.5 rounded-xl transition-colors">
             <input
               type="checkbox"
               checked={ostChecklist.boneDensityScan}
               onChange={() => handleCheckboxChange('boneDensityScan')}
-              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5"
+              className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5 cursor-pointer"
             />
             <div>
               <span className="font-bold block">Densitometría Ósea al Día</span>

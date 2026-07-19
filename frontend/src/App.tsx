@@ -122,10 +122,10 @@ export default function App() {
   if (profile.isPinEnabled && !pinVerified) {
     return (
       <div className="min-h-screen bg-brand-earth-50 flex flex-col justify-center items-center px-4 py-8">
-        <div className="max-w-md w-full glass rounded-3xl p-8 shadow-2xl border border-brand-earth-100 flex flex-col items-center justify-between min-h-[500px]">
+        <div className="max-w-md w-full glass rounded-3xl p-8 shadow-2xl border border-brand-earth-100 flex flex-col items-center justify-between min-h-[500px] animate-pop-in">
           
           <div className="text-center space-y-3 pt-6">
-            <div className="mx-auto h-16 w-16 bg-brand-teal-50 text-brand-teal-600 rounded-full flex items-center justify-center shadow-md">
+            <div className="mx-auto h-16 w-16 bg-brand-teal-50 text-brand-teal-600 rounded-full flex items-center justify-center shadow-md animate-pulse-soft">
               <Shield className="h-8 w-8" />
             </div>
             <h2 className="text-2xl font-black text-brand-earth-900">Aplicación Bloqueada</h2>
@@ -159,7 +159,7 @@ export default function App() {
                 key={num}
                 type="button"
                 onClick={() => handlePinDigitClick(num)}
-                className="h-14 rounded-2xl bg-white border border-brand-earth-200 hover:bg-brand-earth-50 text-brand-earth-900 font-extrabold text-xl flex items-center justify-center transition-all shadow-sm active:scale-95"
+                className="h-14 rounded-2xl bg-white border border-brand-earth-200 hover:bg-brand-earth-50 text-brand-earth-900 font-extrabold text-xl flex items-center justify-center transition-all shadow-sm active-press"
               >
                 {num}
               </button>
@@ -167,21 +167,21 @@ export default function App() {
             <button
               type="button"
               onClick={() => setInputPin('')}
-              className="h-14 rounded-2xl bg-brand-earth-100 hover:bg-brand-earth-200 text-brand-earth-700 font-bold text-xs uppercase flex items-center justify-center transition-all shadow-sm"
+              className="h-14 rounded-2xl bg-brand-earth-100 hover:bg-brand-earth-200 text-brand-earth-700 font-bold text-xs uppercase flex items-center justify-center transition-all shadow-sm active-press"
             >
               Borrar
             </button>
             <button
               type="button"
               onClick={() => handlePinDigitClick('0')}
-              className="h-14 rounded-2xl bg-white border border-brand-earth-200 hover:bg-brand-earth-50 text-brand-earth-900 font-extrabold text-xl flex items-center justify-center transition-all shadow-sm active:scale-95"
+              className="h-14 rounded-2xl bg-white border border-brand-earth-200 hover:bg-brand-earth-50 text-brand-earth-900 font-extrabold text-xl flex items-center justify-center transition-all shadow-sm active-press"
             >
               0
             </button>
             <button
               type="button"
               onClick={handlePinBackspace}
-              className="h-14 rounded-2xl bg-brand-earth-100 hover:bg-brand-earth-200 text-brand-earth-700 font-bold text-lg flex items-center justify-center transition-all shadow-sm"
+              className="h-14 rounded-2xl bg-brand-earth-100 hover:bg-brand-earth-200 text-brand-earth-700 font-bold text-lg flex items-center justify-center transition-all shadow-sm active-press"
             >
               ⌫
             </button>
@@ -198,8 +198,8 @@ export default function App() {
       {/* HEADER */}
       <header className="glass sticky top-0 z-40 border-b border-brand-earth-100/50 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🌱</span>
+          <div className="flex items-center gap-2 active-press cursor-pointer">
+            <span className="text-2xl animate-pulse-soft">🌱</span>
             <span className="font-extrabold text-lg text-brand-earth-900 tracking-tight">Blooma</span>
           </div>
 
@@ -249,29 +249,35 @@ export default function App() {
       </header>
 
       {/* VIEW CONTROLLER */}
-      <main className="flex-1 w-full max-w-4xl mx-auto pb-24 md:pb-6">
+      <main className="flex-1 w-full max-w-4xl mx-auto pb-24 md:pb-6 px-4">
         {activeTab === 'dashboard' && (
-          <>
+          <div className="animate-page-enter">
             {profile.stage === 'cycle' && <CycleDashboard />}
             {profile.stage === 'pregnancy' && <PregnancyDashboard />}
             {profile.stage === 'menopause' && <MenopauseDashboard />}
-          </>
+          </div>
         )}
         
         {activeTab === 'log' && (
-          <LogSymptoms stage={profile.stage} onSave={() => setActiveTab('dashboard')} />
+          <div className="animate-page-enter">
+            <LogSymptoms stage={profile.stage} onSave={() => setActiveTab('dashboard')} />
+          </div>
         )}
         
         {activeTab === 'history' && (
-          <History stage={profile.stage} />
+          <div className="animate-page-enter">
+            <History stage={profile.stage} />
+          </div>
         )}
         
         {activeTab === 'settings' && (
-          <Settings 
-            profile={profile} 
-            onProfileUpdate={(updated) => setProfile(updated)} 
-            onResetApp={handleReset} 
-          />
+          <div className="animate-page-enter">
+            <Settings 
+              profile={profile} 
+              onProfileUpdate={(updated) => setProfile(updated)} 
+              onResetApp={handleReset} 
+            />
+          </div>
         )}
       </main>
 
@@ -282,44 +288,44 @@ export default function App() {
           <button
             type="button"
             onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center justify-center py-1 transition-all ${
-              activeTab === 'dashboard' ? 'text-brand-teal-600 scale-105' : 'text-brand-earth-500 hover:text-brand-earth-700'
+            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
+              activeTab === 'dashboard' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
             }`}
           >
-            <Calendar className="h-5 w-5" />
+            <Calendar className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'dashboard' ? 'scale-110' : ''}`} />
             <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Hoy</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('log')}
-            className={`flex flex-col items-center justify-center py-1 transition-all ${
-              activeTab === 'log' ? 'text-brand-teal-600 scale-105' : 'text-brand-earth-500 hover:text-brand-earth-700'
+            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
+              activeTab === 'log' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
             }`}
           >
-            <ClipboardList className="h-5 w-5" />
+            <ClipboardList className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'log' ? 'scale-110' : ''}`} />
             <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Registrar</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('history')}
-            className={`flex flex-col items-center justify-center py-1 transition-all ${
-              activeTab === 'history' ? 'text-brand-teal-600 scale-105' : 'text-brand-earth-500 hover:text-brand-earth-700'
+            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
+              activeTab === 'history' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
             }`}
           >
-            <Database className="h-5 w-5" />
+            <Database className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'history' ? 'scale-110' : ''}`} />
             <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Bitácora</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('settings')}
-            className={`flex flex-col items-center justify-center py-1 transition-all ${
-              activeTab === 'settings' ? 'text-brand-teal-600 scale-105' : 'text-brand-earth-500 hover:text-brand-earth-700'
+            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
+              activeTab === 'settings' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
             }`}
           >
-            <SettingsIcon className="h-5 w-5" />
+            <SettingsIcon className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'settings' ? 'scale-110' : ''}`} />
             <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Ajustes</span>
           </button>
 

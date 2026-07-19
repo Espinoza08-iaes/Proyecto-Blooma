@@ -165,12 +165,12 @@ export default function CycleDashboard() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       
       {/* PREDICCIÓN CARD */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden animate-fade-in-up delay-75 card-hover">
         <div className="absolute top-0 right-0 bg-brand-teal-500/10 h-32 w-32 rounded-full blur-3xl -z-10" />
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse-soft">
               <Sparkles className="h-3.5 w-3.5" />
               Tu Predicción
             </span>
@@ -184,7 +184,7 @@ export default function CycleDashboard() {
             </p>
           </div>
 
-          <div className="bg-white/80 border border-brand-earth-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center min-w-[120px] shadow-sm">
+          <div className="bg-white/80 border border-brand-earth-100 p-4 rounded-2xl flex flex-col items-center justify-center text-center min-w-[120px] shadow-sm transition-all duration-300 hover:scale-105">
             <span className="text-[10px] font-bold text-brand-earth-500 uppercase tracking-wider">Confianza</span>
             <span className="text-sm font-extrabold text-brand-teal-700">{stats.confidence}</span>
             {stats.stdDev > 0 && (
@@ -204,7 +204,7 @@ export default function CycleDashboard() {
       </section>
 
       {/* CALENDARIO */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4 animate-fade-in-up delay-150">
         <div className="flex items-center justify-between border-b border-brand-earth-100 pb-3">
           <div className="flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-brand-teal-600" />
@@ -232,15 +232,15 @@ export default function CycleDashboard() {
             const isCurrentMonth = dateItem.getMonth() === month;
             const isToday = format(dateItem, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
             
-            let bgClass = 'hover:bg-brand-earth-100/50';
+            let bgClass = 'hover:bg-brand-earth-100/50 active-press cursor-pointer';
             let textClass = isCurrentMonth ? 'text-brand-earth-900 font-medium' : 'text-brand-earth-400';
             
             if (status === 'period') {
-              bgClass = 'bg-brand-coral-500 text-white font-bold shadow-sm';
+              bgClass = 'bg-brand-coral-500 text-white font-bold shadow-sm active-press cursor-pointer';
             } else if (status === 'predicted-period') {
-              bgClass = 'bg-brand-coral-100 text-brand-coral-800 font-bold border border-dashed border-brand-coral-300';
+              bgClass = 'bg-brand-coral-100 text-brand-coral-800 font-bold border border-dashed border-brand-coral-300 active-press cursor-pointer';
             } else if (status === 'fertile') {
-              bgClass = 'bg-brand-teal-100 text-brand-teal-900 font-bold border border-brand-teal-200';
+              bgClass = 'bg-brand-teal-100 text-brand-teal-900 font-bold border border-brand-teal-200 active-press cursor-pointer';
             }
 
             return (
@@ -275,7 +275,7 @@ export default function CycleDashboard() {
       </section>
 
       {/* RECOMENDACIÓN DE BIENESTAR */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 flex items-start gap-4">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 flex items-start gap-4 animate-fade-in-up delay-200 card-hover">
         <div className="bg-brand-teal-50 h-10 w-10 rounded-xl flex items-center justify-center text-brand-teal-600 flex-shrink-0">
           <Info className="h-5 w-5" />
         </div>

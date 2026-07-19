@@ -115,12 +115,12 @@ export default function PregnancyDashboard() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       
       {/* RUEDA DE PROGRESO */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in-up delay-75 card-hover">
         <div className="absolute top-0 right-0 bg-brand-teal-500/10 h-32 w-32 rounded-full blur-3xl -z-10" />
 
         <div className="flex items-center gap-6">
           {/* Radial visual */}
-          <div className="relative h-28 w-28 rounded-full border-4 border-brand-teal-100 flex items-center justify-center bg-white shadow-inner flex-shrink-0">
+          <div className="relative h-28 w-28 rounded-full border-4 border-brand-teal-100 flex items-center justify-center bg-white shadow-inner flex-shrink-0 transition-transform duration-300 hover:scale-105">
             <div className="absolute inset-2 border border-brand-teal-200 rounded-full flex flex-col items-center justify-center">
               <span className="text-[10px] font-bold text-brand-earth-500 uppercase tracking-wider">Semana</span>
               <span className="text-3xl font-extrabold text-brand-teal-600">{gestationWeeks}</span>
@@ -142,7 +142,7 @@ export default function PregnancyDashboard() {
           </div>
 
           <div className="space-y-1">
-            <span className="text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider inline-block">
+            <span className="text-xs bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full font-bold uppercase tracking-wider inline-block animate-pulse-soft">
               Gestación Activa
             </span>
             <h2 className="text-xl font-bold text-brand-earth-900">Tu bebé tiene el tamaño de un/a:</h2>
@@ -156,7 +156,7 @@ export default function PregnancyDashboard() {
         <button
           type="button"
           onClick={() => setShowTriage(true)}
-          className="bg-brand-coral-500 hover:bg-brand-coral-600 text-white font-bold py-3 px-6 rounded-2xl shadow-md flex items-center gap-2 text-sm transition-all"
+          className="bg-brand-coral-500 hover:bg-brand-coral-600 text-white font-bold py-3 px-6 rounded-2xl shadow-md flex items-center gap-2 text-sm transition-all active-press"
         >
           <ShieldAlert className="h-4 w-4" />
           Evaluar Síntomas (Triaje)
@@ -165,42 +165,42 @@ export default function PregnancyDashboard() {
 
       {/* EVALUADOR DE TRIAJE MODAL */}
       {showTriage && (
-        <div className="fixed inset-0 bg-brand-earth-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="glass rounded-3xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto space-y-6 shadow-2xl border border-brand-earth-200">
+        <div className="fixed inset-0 bg-brand-earth-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-page-enter">
+          <div className="glass rounded-3xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto space-y-6 shadow-2xl border border-brand-earth-200 animate-pop-in">
             
             {!triageResult ? (
               <>
                 <div className="flex items-center justify-between border-b border-brand-earth-100 pb-3">
                   <h3 className="font-extrabold text-brand-earth-900 flex items-center gap-2">
-                    <ShieldAlert className="h-5 w-5 text-brand-coral-500" />
+                    <ShieldAlert className="h-5 w-5 text-brand-coral-500 animate-pulse-soft" />
                     Triaje de Síntomas Obstetras
                   </h3>
                   <button
                     type="button"
                     onClick={() => setShowTriage(false)}
-                    className="text-brand-earth-500 hover:text-brand-earth-700 text-sm font-bold"
+                    className="text-brand-earth-500 hover:text-brand-earth-700 text-sm font-bold active-press"
                   >
                     Cerrar
                   </button>
                 </div>
 
-                <div className="bg-brand-sand-100 text-xs text-brand-earth-700 p-3 rounded-xl border border-brand-earth-100 leading-relaxed">
+                <div className="bg-brand-sand-100 text-xs text-brand-earth-700 p-3 rounded-xl border border-brand-earth-100 leading-relaxed animate-fade-in-up">
                   <strong>Instrucción Clínica:</strong> Selecciona todos los síntomas que presentes. El algoritmo clasificará tu nivel de urgencia.
                 </div>
 
                 {/* Sección Urgentes */}
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in-up delay-75">
                   <h4 className="text-xs font-bold text-brand-coral-600 uppercase tracking-wider">
                     ⚠️ Señales de Alerta Críticas (Urgente)
                   </h4>
                   <div className="space-y-2 bg-brand-coral-50/50 p-3 rounded-xl border border-brand-coral-100">
                     {urgentSymptoms.map(s => (
-                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-800 cursor-pointer">
+                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-coral-100/30 p-1.5 rounded-lg transition-colors">
                         <input
                           type="checkbox"
                           checked={checkedSymptoms.includes(s.id)}
                           onChange={() => handleCheckboxChange(s.id)}
-                          className="h-4.5 w-4.5 rounded border-brand-coral-300 text-brand-coral-600 accent-brand-coral-500 mt-0.5"
+                          className="h-4.5 w-4.5 rounded border-brand-coral-300 text-brand-coral-600 accent-brand-coral-500 mt-0.5 cursor-pointer"
                         />
                         {s.label}
                       </label>
@@ -209,18 +209,18 @@ export default function PregnancyDashboard() {
                 </div>
 
                 {/* Sección Vigilancia */}
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in-up delay-150">
                   <h4 className="text-xs font-bold text-brand-earth-700 uppercase tracking-wider">
                     🔍 Síntomas de Cuidado (Vigilar)
                   </h4>
                   <div className="space-y-2 bg-brand-earth-50 p-3 rounded-xl border border-brand-earth-100">
                     {watchSymptoms.map(s => (
-                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-800 cursor-pointer">
+                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-800 cursor-pointer active-press hover:bg-brand-earth-100/40 p-1.5 rounded-lg transition-colors">
                         <input
                           type="checkbox"
                           checked={checkedSymptoms.includes(s.id)}
                           onChange={() => handleCheckboxChange(s.id)}
-                          className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5"
+                          className="h-4.5 w-4.5 rounded border-brand-earth-300 text-brand-teal-600 accent-brand-teal-500 mt-0.5 cursor-pointer"
                         />
                         {s.label}
                       </label>
@@ -229,18 +229,18 @@ export default function PregnancyDashboard() {
                 </div>
 
                 {/* Sección Normales */}
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in-up delay-200">
                   <h4 className="text-xs font-bold text-brand-earth-500 uppercase tracking-wider">
                     ✓ Cambios Comunes (Normales)
                   </h4>
                   <div className="space-y-2 bg-white/50 p-3 rounded-xl border border-brand-earth-100">
                     {normalSymptoms.map(s => (
-                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-600 cursor-pointer">
+                      <label key={s.id} className="flex items-start gap-2.5 text-xs text-brand-earth-600 cursor-pointer active-press hover:bg-brand-earth-100/30 p-1.5 rounded-lg transition-colors">
                         <input
                           type="checkbox"
                           checked={checkedSymptoms.includes(s.id)}
                           onChange={() => handleCheckboxChange(s.id)}
-                          className="h-4.5 w-4.5 rounded border-brand-earth-200 text-brand-earth-400 accent-brand-earth-500 mt-0.5"
+                          className="h-4.5 w-4.5 rounded border-brand-earth-200 text-brand-earth-400 accent-brand-earth-500 mt-0.5 cursor-pointer"
                         />
                         {s.label}
                       </label>
@@ -251,14 +251,14 @@ export default function PregnancyDashboard() {
                 <button
                   type="button"
                   onClick={evaluateTriage}
-                  className="w-full bg-brand-teal-600 hover:bg-brand-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-xs uppercase tracking-wider"
+                  className="w-full bg-brand-teal-600 hover:bg-brand-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-xs uppercase tracking-wider active-press"
                 >
                   Evaluar y Clasificar
                 </button>
               </>
             ) : (
               // Vista Resultados
-              <div className="space-y-6 text-center py-4">
+              <div className="space-y-6 text-center py-4 animate-pop-in">
                 <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center shadow-md">
                   {triageResult.classification === 'urgente' && (
                     <div className="h-16 w-16 bg-brand-coral-100 text-brand-coral-600 rounded-full flex items-center justify-center animate-bounce">
@@ -333,7 +333,7 @@ export default function PregnancyDashboard() {
                 <button
                   type="button"
                   onClick={resetTriage}
-                  className="w-full bg-brand-teal-600 hover:bg-brand-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-xs uppercase tracking-wider"
+                  className="w-full bg-brand-teal-600 hover:bg-brand-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-xs uppercase tracking-wider active-press"
                 >
                   Entendido
                 </button>
@@ -345,14 +345,14 @@ export default function PregnancyDashboard() {
       )}
 
       {/* DIRECTORIO CASAS MATERNAS */}
-      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4">
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4 animate-fade-in-up delay-150 card-hover">
         <div className="flex items-center justify-between border-b border-brand-earth-100 pb-3">
           <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-brand-teal-600" />
+            <MapPin className="h-5 w-5 text-brand-teal-600 animate-pulse-soft" />
             <h3 className="font-bold text-brand-earth-900">Casas Maternas del País</h3>
           </div>
           
-          <div className="flex items-center gap-1 bg-white border border-brand-earth-200 px-3 py-1 rounded-full text-xs font-semibold">
+          <div className="flex items-center gap-1 bg-white border border-brand-earth-200 px-3 py-1 rounded-full text-xs font-semibold shadow-sm hover:border-brand-teal-300 transition-all">
             <Search className="h-3 w-3 text-brand-earth-400" />
             <select
               value={selectedDept}
@@ -368,31 +368,32 @@ export default function PregnancyDashboard() {
 
         <div className="space-y-3 max-h-[300px] overflow-y-auto no-scrollbar">
           {filteredHouses.length > 0 ? (
-            filteredHouses.map(h => (
+            filteredHouses.map((h, i) => (
               <div
                 key={h.id}
-                className="bg-white/80 border border-brand-earth-100/50 rounded-2xl p-4 flex justify-between items-center gap-4 hover:shadow-sm transition-all"
+                className="bg-white/80 border border-brand-earth-100/50 rounded-2xl p-4 flex justify-between items-center gap-4 hover:shadow-md hover:border-brand-teal-200 transition-all duration-300 group"
+                style={{ animationDelay: `${i * 30}ms` }}
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] bg-brand-teal-50 text-brand-teal-700 px-2 py-0.5 rounded-full font-bold uppercase">
+                    <span className="text-[10px] bg-brand-teal-50 text-brand-teal-700 px-2 py-0.5 rounded-full font-bold uppercase transition-colors group-hover:bg-brand-teal-100">
                       {h.department}
                     </span>
                     <span className="text-[10px] bg-brand-earth-50 text-brand-earth-600 px-2 py-0.5 rounded-full font-bold">
                       {h.municipality}
                     </span>
                   </div>
-                  <h4 className="font-bold text-sm text-brand-earth-900">{h.name}</h4>
+                  <h4 className="font-bold text-sm text-brand-earth-900 group-hover:text-brand-teal-800 transition-colors">{h.name}</h4>
                   <p className="text-xs text-brand-earth-600 leading-tight">{h.address}</p>
                 </div>
 
                 {h.phone && (
                   <a
                     href={`tel:${h.phone.replace(/\s+/g, '')}`}
-                    className="bg-brand-teal-50 hover:bg-brand-teal-100 text-brand-teal-700 p-3 rounded-full transition-all border border-brand-teal-200/50 flex-shrink-0"
+                    className="bg-brand-teal-50 hover:bg-brand-teal-100 text-brand-teal-700 p-3 rounded-full transition-all border border-brand-teal-200/50 flex-shrink-0 active-press shadow-sm"
                     title={`Llamar a ${h.name}`}
                   >
-                    <Phone className="h-4 w-4" />
+                    <Phone className="h-4 w-4 group-hover:rotate-12 transition-transform" />
                   </a>
                 )}
               </div>
@@ -406,3 +407,4 @@ export default function PregnancyDashboard() {
     </div>
   );
 }
+

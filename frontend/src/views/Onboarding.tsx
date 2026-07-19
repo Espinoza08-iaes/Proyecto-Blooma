@@ -93,12 +93,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         ))}
       </div>
 
-      <div className="glass rounded-3xl p-8 shadow-xl border border-brand-earth-100 flex-1 flex flex-col justify-between">
+      <div className="glass rounded-3xl p-8 shadow-xl border border-brand-earth-100 flex-1 flex flex-col justify-between animate-pop-in">
         
         {/* STEP 1: Bienvenida */}
         {step === 1 && (
-          <div className="space-y-6 flex-1 flex flex-col justify-center">
-            <div className="mx-auto bg-brand-teal-50 h-20 w-20 rounded-2xl flex items-center justify-center text-brand-teal-600 shadow-inner animate-pulse">
+          <div className="space-y-6 flex-1 flex flex-col justify-center animate-page-enter">
+            <div className="mx-auto bg-brand-teal-50 h-20 w-20 rounded-2xl flex items-center justify-center text-brand-teal-600 shadow-inner animate-pulse-soft">
               <Sparkles className="h-10 w-10" />
             </div>
             <div className="text-center space-y-2">
@@ -109,7 +109,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 Tu compañera de salud íntima, privada y local-first.
               </p>
             </div>
-            <div className="bg-brand-earth-50 rounded-2xl p-4 border border-brand-earth-100 text-sm leading-relaxed text-brand-earth-700">
+            <div className="bg-brand-earth-50 rounded-2xl p-4 border border-brand-earth-100 text-sm leading-relaxed text-brand-earth-700 hover:shadow-inner transition-shadow duration-300">
               Blooma está diseñada para funcionar <strong>completamente offline</strong>. Tus datos médicos sensibles nunca abandonan tu dispositivo, protegiéndote contra la vigilancia de datos íntimos.
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* STEP 2: Selección de etapa */}
         {step === 2 && (
-          <div className="space-y-6 flex-1">
+          <div className="space-y-6 flex-1 animate-page-enter">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-brand-earth-900">¿En qué etapa te encuentras?</h2>
               <p className="text-sm text-brand-earth-600">Personalizaremos la aplicación para tus necesidades.</p>
@@ -128,13 +128,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 type="button"
                 onClick={() => setStage('cycle')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 ${
+                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
                   stage === 'cycle'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 ${
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
                   stage === 'cycle' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
                   <Activity className="h-6 w-6" />
@@ -149,13 +149,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 type="button"
                 onClick={() => setStage('pregnancy')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 ${
+                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
                   stage === 'pregnancy'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 ${
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
                   stage === 'pregnancy' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
                   <Heart className="h-6 w-6" />
@@ -170,13 +170,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 type="button"
                 onClick={() => setStage('menopause')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 ${
+                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
                   stage === 'menopause'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 ${
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
                   stage === 'menopause' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
                   <Shield className="h-6 w-6" />
@@ -192,7 +192,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* STEP 3: Configuración específica */}
         {step === 3 && (
-          <div className="space-y-6 flex-1">
+          <div className="space-y-6 flex-1 animate-page-enter">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-brand-earth-900">Cuéntanos un poco más</h2>
               <p className="text-sm text-brand-earth-600">Estos datos nos ayudan a calibrar tus estimaciones.</p>
@@ -208,14 +208,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   placeholder="Ej. 28"
                   value={age || ''}
                   onChange={(e) => setAge(e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white"
+                  className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white transition-all"
                 />
               </div>
 
               {/* Ajustes de ciclo */}
               {stage === 'cycle' && (
                 <>
-                  <div>
+                  <div className="animate-fade-in-up delay-75">
                     <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
                       ¿Cuándo empezó tu último periodo?
                     </label>
@@ -223,10 +223,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       type="date"
                       value={lastPeriodDate}
                       onChange={(e) => setLastPeriodDate(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white transition-all"
                     />
                   </div>
-                  <div>
+                  <div className="animate-fade-in-up delay-150">
                     <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
                       Duración promedio del ciclo ({avgCycleLength} días)
                     </label>
@@ -236,11 +236,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       max="45"
                       value={avgCycleLength}
                       onChange={(e) => setAvgCycleLength(Number(e.target.value))}
-                      className="w-full accent-brand-teal-500"
+                      className="w-full accent-brand-teal-500 cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-brand-earth-500 px-1">
                       <span>20 días</span>
-                      <span>Regular (28)</span>
+                      <span className="font-bold text-brand-teal-700">Regular (28)</span>
                       <span>45 días</span>
                     </div>
                   </div>
@@ -249,7 +249,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
               {/* Ajustes de embarazo */}
               {stage === 'pregnancy' && (
-                <div>
+                <div className="animate-fade-in-up delay-75">
                   <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
                     ¿En qué semana de embarazo te encuentras? ({gestationWeek} semanas)
                   </label>
@@ -259,11 +259,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     max="42"
                     value={gestationWeek}
                     onChange={(e) => setGestationWeek(Number(e.target.value))}
-                    className="w-full accent-brand-teal-500"
+                    className="w-full accent-brand-teal-500 cursor-pointer"
                   />
                   <div className="flex justify-between text-xs text-brand-earth-500 px-1">
                     <span>1 semana</span>
-                    <span>Semana {gestationWeek}</span>
+                    <span className="font-bold text-brand-teal-700">Semana {gestationWeek}</span>
                     <span>42 semanas</span>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
               {/* Ajustes de menopausia */}
               {stage === 'menopause' && (
-                <div>
+                <div className="animate-fade-in-up delay-75">
                   <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
                     ¿Cuántos meses llevas sin periodo menstrual regular? ({menopauseMonths} meses)
                   </label>
@@ -281,11 +281,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     max="60"
                     value={menopauseMonths}
                     onChange={(e) => setMenopauseMonths(Number(e.target.value))}
-                    className="w-full accent-brand-teal-500"
+                    className="w-full accent-brand-teal-500 cursor-pointer"
                   />
                   <div className="flex justify-between text-xs text-brand-earth-500 px-1">
                     <span>1 mes</span>
-                    <span>{menopauseMonths} meses</span>
+                    <span className="font-bold text-brand-teal-700">{menopauseMonths} meses</span>
                     <span>5 años (60)</span>
                   </div>
                 </div>
@@ -296,10 +296,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* STEP 4: Seguridad y Privacidad */}
         {step === 4 && (
-          <div className="space-y-6 flex-1">
+          <div className="space-y-6 flex-1 animate-page-enter">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-brand-earth-900 flex items-center justify-center gap-2">
-                <Shield className="h-6 w-6 text-brand-teal-600" />
+                <Shield className="h-6 w-6 text-brand-teal-600 animate-pulse-soft" />
                 Seguridad e Intimidad
               </h2>
               <p className="text-sm text-brand-earth-600">
@@ -309,7 +309,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
             <div className="space-y-4">
               {/* Bloqueo PIN */}
-              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3">
+              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3 shadow-sm hover:shadow transition-shadow duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-bold text-sm text-brand-earth-900">Bloqueo por PIN de acceso</h3>
@@ -319,7 +319,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     type="checkbox"
                     checked={pinEnabled}
                     onChange={(e) => setPinEnabled(e.target.checked)}
-                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500"
+                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer transition-all"
                   />
                 </div>
                 {pinEnabled && (
@@ -330,13 +330,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     value={pinCode}
                     onChange={(e) => handlePinInput(e.target.value)}
                     placeholder="Ingresa un PIN de 4 dígitos"
-                    className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 text-center tracking-widest text-lg font-bold bg-brand-earth-50 focus:outline-none focus:ring-2 focus:ring-brand-teal-300"
+                    className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 text-center tracking-widest text-lg font-bold bg-brand-earth-50 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 animate-fade-in-up"
                   />
                 )}
               </div>
 
               {/* Sincronización en la nube */}
-              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3">
+              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3 shadow-sm hover:shadow transition-shadow duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-bold text-sm text-brand-earth-900">Sincronización en la nube (Opt-in)</h3>
@@ -346,7 +346,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     type="checkbox"
                     checked={optInSync}
                     onChange={(e) => setOptInSync(e.target.checked)}
-                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500"
+                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer transition-all"
                   />
                 </div>
                 <div className="text-[11px] text-brand-earth-500 bg-brand-earth-50 p-2 rounded-lg leading-relaxed">
@@ -363,7 +363,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             <button
               type="button"
               onClick={handleBack}
-              className="px-6 py-3 rounded-xl border border-brand-earth-200 text-brand-earth-700 font-medium hover:bg-brand-earth-100/50 transition-colors"
+              className="px-6 py-3 rounded-xl border border-brand-earth-200 text-brand-earth-700 font-medium hover:bg-brand-earth-100/50 active-press transition-all duration-200"
             >
               Atrás
             </button>
@@ -375,7 +375,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             type="button"
             onClick={handleNext}
             disabled={step === 4 && pinEnabled && pinCode.length !== 4}
-            className={`px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all text-white ${
+            className={`px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg active-press transition-all text-white ${
               step === 4 && pinEnabled && pinCode.length !== 4
                 ? 'bg-brand-earth-300 cursor-not-allowed'
                 : 'bg-brand-teal-600 hover:bg-brand-teal-700'
@@ -386,6 +386,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
 
       </div>
+
     </div>
   );
 }
