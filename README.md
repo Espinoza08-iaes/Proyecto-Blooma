@@ -5,7 +5,11 @@
 [![Theme - Salud](https://img.shields.io/badge/Tematica-Salud--AF-teal?style=flat-square)](#)
 [![License - MIT](https://img.shields.io/badge/Licencia-MIT-green?style=flat-square)](#)
 
-Blooma (del ingles "bloom": florecer, crecer, desarrollarse plenamente) es una aplicacion movil progresiva (PWA) diseñada para acompañar a las mujeres nicaragüenses en cada etapa de su vida reproductiva: ciclo menstrual, embarazo y menopausia.
+Blooma (del ingles "bloom": florecer, crecer, desarrollarse plenamente) es una aplicacion web y movil progresiva (PWA) diseñada para acompañar a las mujeres en cada etapa de su vida reproductiva: ciclo menstrual, embarazo y menopausia.
+
+### Enlace del Proyecto en Produccion:
+El sistema se encuentra desplegado y disponible de forma publica en Vercel a traves del siguiente enlace:
+[https://proyecto-blooma.vercel.app/](https://proyecto-blooma.vercel.app/)
 
 ---
 
@@ -36,7 +40,7 @@ De acuerdo con los requerimientos de la Guia del Primer Sprint de Evaluacion par
 * **Descripcion**: Planificacion organizada y priorizada de las tareas por disciplina (UX/UI, Frontend, Backend, Producto), con asignacion de responsables y niveles de prioridad.
 * **Enlace al Tablero**: [Enlace pendiente de carga por el equipo]
 
-#### Resumen de Tareas del Product Backlog (Fase Inicial)
+#### Estado de Avance de las Tareas del Product Backlog
 
 | Disciplina | Tarea / Entregable | Prioridad | Responsable | Estado |
 | :--- | :--- | :--- | :--- | :--- |
@@ -47,12 +51,14 @@ De acuerdo con los requerimientos de la Guia del Primer Sprint de Evaluacion par
 | **Producto** | Creacion del Product Backlog en el Tablero Kanban | Alta | Lider de Producto | Realizado |
 | **Diseño** | Elaboracion de Wireframes e interfaces de onboarding en Figma | Alta | Diseñador UX/UI | En proceso |
 | **Producto** | Guion y grabacion del Video Pitch de 1 minuto | Alta | Lider de Producto | En proceso |
-| **Frontend** | Implementacion de IndexedDB con Dexie para soporte offline | Alta | Programador Frontend | Pendiente |
-| **Backend** | Configuracion de tablas de Supabase y politicas de seguridad RLS | Alta | Programador Backend | Pendiente |
-| **Frontend** | Implementacion del algoritmo adaptativo de ciclo menstrual | Media | Programador Frontend | Pendiente |
-| **Frontend** | Desarrollo del Módulo de Triaje de Embarazo | Media | Programador Frontend | Pendiente |
-| **Backend** | Seed de base de datos con Directorio de Casas Maternas | Media | Programador Backend | Pendiente |
-| **Diseño** | Diseño de interfaces del modulo de Menopausia | Baja | Diseñador UX/UI | Pendiente |
+| **Frontend** | Implementacion de IndexedDB con Dexie para soporte offline | Alta | Programador Frontend | Realizado |
+| **Backend** | Configuracion de tablas de Supabase y politicas de seguridad RLS | Alta | Programador Backend | Realizado |
+| **Frontend** | Implementacion del algoritmo adaptativo de ciclo menstrual | Media | Programador Frontend | Realizado |
+| **Frontend** | Desarrollo del Módulo de Triaje de Embarazo | Media | Programador Frontend | Realizado |
+| **Backend** | Seed de base de datos con Directorio de Casas Maternas | Media | Programador Backend | Realizado |
+| **Frontend** | Diseño responsivo de 3 columnas para vistas en Laptop/Escritorio | Media | Programador Frontend | Realizado |
+| **Frontend** | Motor de Personalización (temas visuales y accesibilidad) | Media | Programador Frontend | Realizado |
+| **Diseño** | Diseño de interfaces del modulo de Menopausia | Baja | Diseñador UX/UI | En proceso |
 
 ---
 
@@ -93,6 +99,22 @@ graph TD
 * **Educacion Activa**: Enfoque de prevencion de osteoporosis y recordatorio de chequeos de densidad osea.
 * **Apoyo Emocional**: Modulo interactivo de Terapia Cognitivo-Conductual (TCC) orientado a mitigar el impacto de sofocos, ansiedad y trastornos del sueño.
 
+### 4. Interfaz Adaptativa y Escritorio de 3 Columnas
+* **Distribucion Inteligente en Pantallas Grandes**: En laptops y computadoras de escritorio, la aplicacion utiliza una estructura de tres columnas que evita el estiramiento incomodo de elementos:
+  * **Columna Izquierda**: Resumen del perfil de usuario y estado actual de la etapa.
+  * **Columna Central**: Espacio de trabajo contenido para calendarios, bitacora y registros de salud.
+  * **Columna Derecha**: Widgets de consejos diarios y lineas de asistencia medica de emergencia (MINSA Línea Materna 102).
+* **Optimizacion para Movil**: Se adapta fluidamente en formato movil de una sola columna con barra de navegacion flotante inferior.
+
+### 5. Motor de Personalizacion y Accesibilidad
+* **Temas Visuales Exclusivos**: Los usuarios pueden elegir entre cuatro paletas de colores en la seccion de Ajustes para personalizar su entorno de visualizacion:
+  * **Tierra**: Gradientes beiges organicos con acentos teales.
+  * **Orquidea**: Tonos purpuras elegantes con fondo rosa tenue.
+  * **Bosque**: Tonos verde salvia y menta que propician tranquilidad.
+  * **Oceano**: Azules y celestes clinicos terapeuticos.
+* **Escala de Texto de Accesibilidad**: Opcion para ampliar la tipografia en un 12.5% para usuarias con baja vision o cansancio visual.
+* **Iconografia Neutra Personalizable**: Selector de logotipo discreto en la barra superior para mayor privacidad.
+
 ---
 
 ## Privacidad y Seguridad por Diseño (Privacy by Design)
@@ -101,7 +123,7 @@ Para resolver las vulnerabilidades de privacidad asociadas con el almacenamiento
 
 1. **Arquitectura Local-First**: Los datos clinicos y de sintomatologia se guardan localmente en el dispositivo utilizando Dexie (IndexedDB). La sincronizacion con el backend en la nube es opcional (opt-in).
 2. **Modo Sigiloso (Proteccion contra Violencia de Pareja - IPV)**:
-   * Acceso protegido obligatorio mediante PIN de 4 digitos o biometria.
+   * Acceso protegido obligatorio mediante PIN de 4 digitos.
    * **Notificaciones Discretas**: Alertas en pantalla de bloqueo redactadas de forma neutra ("Tienes una actualizacion en Blooma") para evitar la exposicion de datos sensibles.
    * Icono y nombre de la aplicacion configurables por el usuario para camuflar el acceso en la pantalla de inicio.
 3. **Eliminacion de Datos Real**: La opcion "Eliminar mi cuenta" ejecuta un borrado en cascada inmediato tanto en el almacenamiento local como en el backend, garantizando que no se retengan registros de la usuaria.
@@ -117,7 +139,7 @@ El proyecto esta organizado en una estructura desacoplada para facilitar el desa
 graph LR
     subgraph Frontend [Aplicacion Cliente - React PWA]
         UI[Vite + React UI] <--> DB_Local[(Dexie / IndexedDB)]
-        UI <--> TF[Fallback Estadistico / TF.js]
+        UI <--> TF[Fallback Estadistico]
     end
     
     subgraph Backend [Servicio API - Node.js]
