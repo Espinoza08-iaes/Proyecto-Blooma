@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRouter from './routes/auth.js';
 import syncRouter from './routes/sync.js';
 import casasRouter from './routes/casas.js';
+import insightsRouter from './routes/insights.js';
 
 import { db } from './db.js';
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/casas-maternas', casasRouter);
+app.use('/api/insights', insightsRouter);
 
 // Basic health check route
 app.get('/api/health', (req, res) => {

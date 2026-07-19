@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon, Flame, Heart, AlertCircle, Info, Sparkles, Ch
 import { addDays, format, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import CycleWheel from '../components/CycleWheel';
+import SmartHealthInsights from '../components/SmartHealthInsights';
 
 export default function CycleDashboard() {
   const [cycles, setCycles] = useState<Cycle[]>([]);
@@ -353,6 +354,11 @@ export default function CycleDashboard() {
           </div>
         </div>
       </section>
+
+      {/* SMART HEALTH INSIGHTS */}
+      <div className="animate-fade-in-up delay-200">
+        <SmartHealthInsights />
+      </div>
 
     </div>
   );

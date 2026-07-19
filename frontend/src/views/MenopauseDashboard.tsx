@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../db/db';
 import { Shield, Sparkles, BookOpen, ChevronLeft, ChevronRight, Activity, Bone } from 'lucide-react';
+import SmartHealthInsights from '../components/SmartHealthInsights';
 
 const tccSlides = [
   {
@@ -218,6 +219,11 @@ export default function MenopauseDashboard() {
           </label>
         </div>
       </section>
+
+      {/* SMART HEALTH INSIGHTS */}
+      <div className="animate-fade-in-up delay-250">
+        <SmartHealthInsights />
+      </div>
 
     </div>
   );

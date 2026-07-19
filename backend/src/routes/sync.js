@@ -85,20 +85,24 @@ router.post('/', authMiddleware, async (req, res) => {
                 .eq('user_id', userId)
                 .eq('date', clientLog.date);
             }
-          } else if (clientTime > serverTime) {
+          } else {
+            // Intelligent field-level merge: use the field from whichever record was updated most recently,
+            // avoiding loss of other fields updated on different devices.
+            const merged = {
+              mood: clientTime >= serverTime ? (clientLog.mood !== undefined ? clientLog.mood : serverMatch.mood) : (serverMatch.mood !== undefined ? serverMatch.mood : clientLog.mood),
+              notes: clientTime >= serverTime ? (clientLog.notes !== undefined ? clientLog.notes : serverMatch.notes) : (serverMatch.notes !== undefined ? serverMatch.notes : clientLog.notes),
+              flow: clientTime >= serverTime ? (clientLog.flow !== undefined ? clientLog.flow : serverMatch.flow) : (serverMatch.flow !== undefined ? serverMatch.flow : clientLog.flow),
+              pain: clientTime >= serverTime ? (clientLog.pain !== undefined ? clientLog.pain : serverMatch.pain) : (serverMatch.pain !== undefined ? serverMatch.pain : clientLog.pain),
+              temperature: clientTime >= serverTime ? (clientLog.temperature !== undefined ? clientLog.temperature : serverMatch.temperature) : (serverMatch.temperature !== undefined ? serverMatch.temperature : clientLog.temperature),
+              hot_flashes: clientTime >= serverTime ? (clientLog.hotFlashes !== undefined ? clientLog.hotFlashes : serverMatch.hot_flashes) : (serverMatch.hot_flashes !== undefined ? serverMatch.hot_flashes : clientLog.hotFlashes),
+              sleep_quality: clientTime >= serverTime ? (clientLog.sleepQuality !== undefined ? clientLog.sleepQuality : serverMatch.sleep_quality) : (serverMatch.sleep_quality !== undefined ? serverMatch.sleep_quality : clientLog.sleepQuality),
+              anxiety_level: clientTime >= serverTime ? (clientLog.anxietyLevel !== undefined ? clientLog.anxietyLevel : serverMatch.anxiety_level) : (serverMatch.anxiety_level !== undefined ? serverMatch.anxiety_level : clientLog.anxietyLevel),
+              updated_at: new Date(Math.max(clientTime, serverTime)).toISOString()
+            };
+
             await supabase
               .from('daily_logs')
-              .update({
-                mood: clientLog.mood,
-                notes: clientLog.notes,
-                flow: clientLog.flow,
-                pain: clientLog.pain,
-                temperature: clientLog.temperature,
-                hot_flashes: clientLog.hotFlashes,
-                sleep_quality: clientLog.sleepQuality,
-                anxiety_level: clientLog.anxietyLevel,
-                updated_at: clientLog.updatedAt || new Date().toISOString()
-              })
+              .update(merged)
               .eq('user_id', userId)
               .eq('date', clientLog.date);
           }
@@ -137,16 +141,19 @@ router.post('/', authMiddleware, async (req, res) => {
                 .eq('user_id', userId)
                 .eq('date', clientTriage.date);
             }
-          } else if (clientTime > serverTime) {
+          } else {
+            // Intelligent field-level merge for triage (obstetrics)
+            const merged = {
+              gestation_week: clientTime >= serverTime ? (clientTriage.gestationWeek !== undefined ? clientTriage.gestationWeek : serverMatch.gestation_week) : (serverMatch.gestation_week !== undefined ? serverMatch.gestation_week : clientTriage.gestationWeek),
+              symptoms: clientTime >= serverTime ? (clientTriage.symptoms || serverMatch.symptoms) : (serverMatch.symptoms || clientTriage.symptoms),
+              classification: clientTime >= serverTime ? (clientTriage.classification || serverMatch.classification) : (serverMatch.classification || clientTriage.classification),
+              notes: clientTime >= serverTime ? (clientTriage.notes !== undefined ? clientTriage.notes : serverMatch.notes) : (serverMatch.notes !== undefined ? serverMatch.notes : clientTriage.notes),
+              updated_at: new Date(Math.max(clientTime, serverTime)).toISOString()
+            };
+
             await supabase
               .from('registros_embarazo')
-              .update({
-                gestation_week: clientTriage.gestationWeek,
-                symptoms: clientTriage.symptoms,
-                classification: clientTriage.classification,
-                notes: clientTriage.notes,
-                updated_at: clientTriage.updatedAt || new Date().toISOString()
-              })
+              .update(merged)
               .eq('user_id', userId)
               .eq('date', clientTriage.date);
           }
@@ -276,18 +283,19 @@ router.post('/', authMiddleware, async (req, res) => {
           if (clientTime > serverTime) {
             serverDailyLogs.splice(serverMatchIndex, 1);
           }
-        } else if (clientTime > serverTime) {
+        } else {
+          // Intelligent field-level merge for local file DB
           serverDailyLogs[serverMatchIndex] = {
             ...serverLog,
-            mood: clientLog.mood,
-            notes: clientLog.notes,
-            flow: clientLog.flow,
-            pain: clientLog.pain,
-            temperature: clientLog.temperature,
-            hotFlashes: clientLog.hotFlashes,
-            sleepQuality: clientLog.sleepQuality,
-            anxietyLevel: clientLog.anxietyLevel,
-            updatedAt: clientLog.updatedAt || new Date().toISOString()
+            mood: clientTime >= serverTime ? (clientLog.mood !== undefined ? clientLog.mood : serverLog.mood) : (serverLog.mood !== undefined ? serverLog.mood : clientLog.mood),
+            notes: clientTime >= serverTime ? (clientLog.notes !== undefined ? clientLog.notes : serverLog.notes) : (serverLog.notes !== undefined ? serverLog.notes : clientLog.notes),
+            flow: clientTime >= serverTime ? (clientLog.flow !== undefined ? clientLog.flow : serverLog.flow) : (serverLog.flow !== undefined ? serverLog.flow : clientLog.flow),
+            pain: clientTime >= serverTime ? (clientLog.pain !== undefined ? clientLog.pain : serverLog.pain) : (serverLog.pain !== undefined ? serverLog.pain : clientLog.pain),
+            temperature: clientTime >= serverTime ? (clientLog.temperature !== undefined ? clientLog.temperature : serverLog.temperature) : (serverLog.temperature !== undefined ? serverLog.temperature : clientLog.temperature),
+            hotFlashes: clientTime >= serverTime ? (clientLog.hotFlashes !== undefined ? clientLog.hotFlashes : serverLog.hotFlashes) : (serverLog.hotFlashes !== undefined ? serverLog.hotFlashes : clientLog.hotFlashes),
+            sleepQuality: clientTime >= serverTime ? (clientLog.sleepQuality !== undefined ? clientLog.sleepQuality : serverLog.sleepQuality) : (serverLog.sleepQuality !== undefined ? serverLog.sleepQuality : clientLog.sleepQuality),
+            anxietyLevel: clientTime >= serverTime ? (clientLog.anxietyLevel !== undefined ? clientLog.anxietyLevel : serverLog.anxietyLevel) : (serverLog.anxietyLevel !== undefined ? serverLog.anxietyLevel : clientLog.anxietyLevel),
+            updatedAt: new Date(Math.max(clientTime, serverTime)).toISOString()
           };
         }
       } else if (!clientLog.deleted) {
@@ -322,14 +330,15 @@ router.post('/', authMiddleware, async (req, res) => {
           if (clientTime > serverTime) {
             serverTriageRecords.splice(serverMatchIndex, 1);
           }
-        } else if (clientTime > serverTime) {
+        } else {
+          // Intelligent field-level merge for local file DB triage
           serverTriageRecords[serverMatchIndex] = {
             ...serverTriage,
-            gestationWeek: clientTriage.gestationWeek,
-            symptoms: clientTriage.symptoms,
-            classification: clientTriage.classification,
-            notes: clientTriage.notes,
-            updatedAt: clientTriage.updatedAt || new Date().toISOString()
+            gestationWeek: clientTime >= serverTime ? (clientTriage.gestationWeek !== undefined ? clientTriage.gestationWeek : serverTriage.gestationWeek) : (serverTriage.gestationWeek !== undefined ? serverTriage.gestationWeek : clientTriage.gestationWeek),
+            symptoms: clientTime >= serverTime ? (clientTriage.symptoms || serverTriage.symptoms) : (serverTriage.symptoms || clientTriage.symptoms),
+            classification: clientTime >= serverTime ? (clientTriage.classification || serverTriage.classification) : (serverTriage.classification || clientTriage.classification),
+            notes: clientTime >= serverTime ? (clientTriage.notes !== undefined ? clientTriage.notes : serverTriage.notes) : (serverTriage.notes !== undefined ? serverTriage.notes : clientTriage.notes),
+            updatedAt: new Date(Math.max(clientTime, serverTime)).toISOString()
           };
         }
       } else if (!clientTriage.deleted) {

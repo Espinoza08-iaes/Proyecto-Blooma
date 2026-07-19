@@ -3,6 +3,7 @@ import { db, type TriageRecord, type MaternalHouse } from '../db/db';
 import { Heart, Activity, AlertOctagon, Phone, Info, Check, ShieldAlert, Sparkles, MapPin, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import SmartHealthInsights from '../components/SmartHealthInsights';
 
 const urgentSymptoms = [
   { id: 'sangrado', label: 'Sangrado vaginal de cualquier cantidad' },
@@ -403,6 +404,11 @@ export default function PregnancyDashboard() {
           )}
         </div>
       </section>
+
+      {/* SMART HEALTH INSIGHTS */}
+      <div className="animate-fade-in-up delay-200">
+        <SmartHealthInsights />
+      </div>
 
     </div>
   );
