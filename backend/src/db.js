@@ -3,7 +3,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_FILE = path.join(__dirname, '..', 'db.json');
+const DB_FILE = process.env.VERCEL
+  ? '/tmp/db.json'
+  : path.join(__dirname, '..', 'db.json');
 
 // Initial maternal houses seed data
 const initialMaternalHouses = [
@@ -88,6 +90,15 @@ class JsonDatabase {
 
   async init() {
     if (this.initialized) return;
+
+    if (process.env.VERCEL) {
+      try {
+        await fs.access(DB_FILE);
+      } catch {
+        this.data.maternalHouses = initialMaternalHouses;
+        await this.save();
+      }
+    }
 
     try {
       const fileData = await fs.readFile(DB_FILE, 'utf8');
