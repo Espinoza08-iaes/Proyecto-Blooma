@@ -211,14 +211,14 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-earth-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-brand-earth-50 via-white to-brand-teal-50/10 flex flex-col justify-between">
       
       {/* HEADER */}
       <header className="glass sticky top-0 z-40 border-b border-brand-earth-100/50 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 active-press cursor-pointer">
             <span className="text-2xl animate-pulse-soft">🌱</span>
-            <span className="font-extrabold text-lg text-brand-earth-900 tracking-tight">Blooma</span>
+            <span className="font-extrabold text-lg text-brand-earth-900 tracking-tight font-display">Blooma</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -266,39 +266,127 @@ export default function App() {
         </div>
       </header>
 
-      {/* VIEW CONTROLLER */}
-      <main className="flex-1 w-full max-w-4xl mx-auto pb-24 md:pb-6 px-4">
-        {activeTab === 'dashboard' && (
-          <div className="animate-page-enter">
-            {profile.stage === 'cycle' && <CycleDashboard />}
-            {profile.stage === 'pregnancy' && <PregnancyDashboard />}
-            {profile.stage === 'menopause' && <MenopauseDashboard />}
-          </div>
-        )}
-        
-        {activeTab === 'log' && (
-          <div className="animate-page-enter">
-            <LogSymptoms stage={profile.stage} onSave={() => setActiveTab('dashboard')} />
-          </div>
-        )}
-        
-        {activeTab === 'history' && (
-          <div className="animate-page-enter">
-            <History stage={profile.stage} />
-          </div>
-        )}
-        
-        {activeTab === 'settings' && (
-          <div className="animate-page-enter">
-            <Settings 
-              profile={profile} 
-              onProfileUpdate={(updated) => setProfile(updated)} 
-              onResetApp={handleReset} 
-              authToken={authToken}
-              onTokenUpdate={setAuthToken}
-            />
-          </div>
-        )}
+      {/* VIEW CONTROLLER (Responsive Grid) */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          
+          {/* LEFT SIDEBAR (Desktop only) */}
+          <aside className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col gap-5 sticky top-20">
+            {/* Profile widget */}
+            <div className="glass rounded-3xl p-5 border border-brand-earth-100/80 shadow-md card-hover space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-brand-teal-400 to-brand-teal-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">
+                  {profile.age || '?'}
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-brand-earth-900 leading-tight text-sm">Usuario de Blooma</h3>
+                  <span className="text-[10px] text-brand-teal-700 font-extrabold uppercase tracking-wider">
+                    {profile.stage === 'cycle' ? 'Ciclo Menstrual' : profile.stage === 'pregnancy' ? 'Embarazo Activo' : 'Menopausia'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2 border-t border-brand-earth-100/60 pt-3 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-brand-earth-500 font-medium">Edad:</span>
+                  <span className="font-bold text-brand-earth-900">{profile.age ? `${profile.age} años` : 'No especificada'}</span>
+                </div>
+                {profile.stage === 'pregnancy' && profile.gestationWeekStart && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-brand-earth-500 font-medium">Inicio Gestación:</span>
+                    <span className="font-bold text-brand-earth-900">{profile.gestationWeekStart}</span>
+                  </div>
+                )}
+                {profile.stage === 'menopause' && profile.menopauseStartYear && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-brand-earth-500 font-medium">Año de Transición:</span>
+                    <span className="font-bold text-brand-earth-900">{profile.menopauseStartYear}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Quick summary widget */}
+            <div className="glass rounded-3xl p-5 border border-brand-earth-100/80 shadow-md card-hover space-y-2.5">
+              <h4 className="font-extrabold text-brand-earth-900 text-[10px] uppercase tracking-wider">Resumen de Etapa</h4>
+              <p className="text-xs text-brand-earth-600 leading-relaxed">
+                {profile.stage === 'cycle' 
+                  ? 'Registra tus síntomas diariamente. Esto ayuda al modelo a predecir tu periodo menstrual y ventana fértil con mayor precisión.'
+                  : profile.stage === 'pregnancy'
+                  ? 'Monitorea tus síntomas de riesgo con el triaje automatizado y localiza Casas Maternas regionales para asistencia preventiva.'
+                  : 'Registra tus calores súbitos y calidad del sueño para dar seguimiento a los patrones de tu transición biológica.'}
+              </p>
+            </div>
+          </aside>
+
+          {/* MAIN PAGE (Central Content) */}
+          <section className="col-span-1 md:col-span-8 lg:col-span-6 space-y-6">
+            {activeTab === 'dashboard' && (
+              <div className="animate-page-enter">
+                {profile.stage === 'cycle' && <CycleDashboard />}
+                {profile.stage === 'pregnancy' && <PregnancyDashboard />}
+                {profile.stage === 'menopause' && <MenopauseDashboard />}
+              </div>
+            )}
+            
+            {activeTab === 'log' && (
+              <div className="animate-page-enter">
+                <LogSymptoms stage={profile.stage} onSave={() => setActiveTab('dashboard')} />
+              </div>
+            )}
+            
+            {activeTab === 'history' && (
+              <div className="animate-page-enter">
+                <History stage={profile.stage} />
+              </div>
+            )}
+            
+            {activeTab === 'settings' && (
+              <div className="animate-page-enter">
+                <Settings 
+                  profile={profile} 
+                  onProfileUpdate={(updated) => setProfile(updated)} 
+                  onResetApp={handleReset} 
+                  authToken={authToken}
+                  onTokenUpdate={setAuthToken}
+                />
+              </div>
+            )}
+          </section>
+
+          {/* RIGHT SIDEBAR (Desktop/Large screen only) */}
+          <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-20">
+            {/* Wellness tip */}
+            <div className="glass rounded-3xl p-5 border border-brand-earth-100/80 shadow-md card-hover space-y-3">
+              <div className="flex items-center gap-2 text-brand-teal-600">
+                <Sparkles className="h-4.5 w-4.5 animate-pulse-soft" />
+                <h4 className="font-extrabold text-brand-earth-900 text-[10px] uppercase tracking-wider">Consejo del Día</h4>
+              </div>
+              <p className="text-xs text-brand-earth-650 leading-relaxed">
+                Beber suficiente agua, regular tu ciclo de descanso y caminar 30 minutos al día ayuda notablemente a balancear tus hormonas y aliviar dolores físicos.
+              </p>
+            </div>
+
+            {/* Assistance hotline */}
+            <div className="glass rounded-3xl p-5 border border-brand-coral-100/80 shadow-md card-hover bg-brand-coral-50/10 space-y-3">
+              <h4 className="font-extrabold text-brand-coral-800 text-[10px] uppercase tracking-wider">Línea de Asistencia</h4>
+              <p className="text-xs text-brand-earth-600 leading-relaxed">
+                Ante cualquier síntoma de alarma grave o una emergencia obstétrica, puedes llamar gratis a nivel nacional:
+              </p>
+              <div className="flex flex-col gap-1.5 pt-1">
+                <a href="tel:102" className="flex items-center justify-between text-xs font-bold text-brand-coral-750 bg-white hover:bg-brand-coral-50 border border-brand-coral-100 py-2 px-3 rounded-xl transition-all shadow-sm active-press">
+                  <span>Línea Materna MINSA</span>
+                  <span>102</span>
+                </a>
+                <a href="tel:118" className="flex items-center justify-between text-xs font-bold text-brand-earth-700 bg-white hover:bg-brand-earth-50 border border-brand-earth-200 py-2 px-3 rounded-xl transition-all shadow-sm active-press">
+                  <span>Cruz Roja</span>
+                  <span>118</span>
+                </a>
+              </div>
+            </div>
+          </aside>
+
+        </div>
       </main>
 
       {/* RESPONSIVE BOTTOM NAVIGATION (Fixed at bottom for mobile, styled beautifully) */}
