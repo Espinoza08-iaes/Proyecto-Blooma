@@ -26,17 +26,15 @@ app.get('/api/health', (req, res) => {
 });
 
 // Initialize DB and start server
+const serverPort = process.env.PORT || PORT;
+
 db.init().then(() => {
-  if (!process.env.VERCEL) {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  }
+  app.listen(serverPort, () => {
+    console.log(`Server is running on port ${serverPort}`);
+  });
 }).catch(err => {
   console.error('Failed to initialize database:', err);
-  if (!process.env.VERCEL) {
-    process.exit(1);
-  }
+  process.exit(1);
 });
 
 export default app;
