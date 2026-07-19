@@ -8,6 +8,7 @@ import PregnancyDashboard from './views/PregnancyDashboard';
 import MenopauseDashboard from './views/MenopauseDashboard';
 import History from './views/History';
 import { Shield, Sparkles, Heart, Activity, Check, Settings as SettingsIcon, Calendar, ClipboardList, Database, Wifi, WifiOff } from 'lucide-react';
+import BloomaLogo from './components/BloomaLogo';
 
 import { syncLocalDataWithServer } from './db/supabase';
 
@@ -85,6 +86,12 @@ export default function App() {
       bodyEl.classList.add('text-large');
     } else {
       bodyEl.classList.remove('text-large');
+    }
+
+    // 3. Dynamic Favicon updater matching selected theme color
+    const faviconEl = document.querySelector("link[rel='icon']");
+    if (faviconEl) {
+      faviconEl.setAttribute('href', `/favicon-${activeTheme}.svg`);
     }
   }, [profile?.themeColor, profile?.themeTextSize]);
 
@@ -232,53 +239,50 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-brand-earth-50 via-white to-brand-teal-50/10 flex flex-col justify-between">
       
       {/* HEADER */}
-      <header className="glass sticky top-0 z-40 border-b border-brand-earth-100/50 shadow-sm">
+      <header className="glass sticky top-0 z-40 border-b border-brand-earth-100/40 shadow-sm backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 active-press cursor-pointer">
-            {profile?.appIcon === 'flower' && <span className="text-2xl animate-pulse-soft">🌸</span>}
-            {profile?.appIcon === 'butterfly' && <span className="text-2xl animate-pulse-soft">🦋</span>}
-            {profile?.appIcon === 'sun' && <span className="text-2xl animate-pulse-soft">☀️</span>}
-            {(!profile?.appIcon || profile?.appIcon === 'sprout') && <span className="text-2xl animate-pulse-soft">🌱</span>}
-            <span className="font-extrabold text-lg text-brand-earth-900 tracking-tight font-display">Blooma</span>
+          <div className="flex items-center gap-2.5 active-press cursor-pointer">
+            <BloomaLogo variant={profile?.appIcon || 'sprout'} className="h-7 w-7 text-brand-teal-650 animate-pulse-soft" />
+            <span className="font-black text-xl text-brand-earth-900 tracking-tight font-display">Blooma</span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Stage Indicator Badge */}
-            <span className="text-[10px] font-extrabold uppercase bg-brand-teal-100 text-brand-teal-800 px-3 py-1 rounded-full flex items-center gap-1">
+            <span className="text-[10px] font-extrabold uppercase bg-brand-teal-150 text-brand-teal-800 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-brand-teal-200/30">
               {profile.stage === 'cycle' && (
                 <>
-                  <Activity className="h-3 w-3" />
+                  <Activity className="h-3.5 w-3.5 text-brand-teal-700" />
                   Ciclo
                 </>
               )}
               {profile.stage === 'pregnancy' && (
                 <>
-                  <Heart className="h-3 w-3" />
+                  <Heart className="h-3.5 w-3.5 text-brand-coral-500 fill-brand-coral-500" />
                   Embarazo
                 </>
               )}
               {profile.stage === 'menopause' && (
                 <>
-                  <Shield className="h-3 w-3" />
+                  <Shield className="h-3.5 w-3.5 text-indigo-650" />
                   Menopausia
                 </>
               )}
             </span>
 
             {/* Offline Status */}
-            <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full flex items-center gap-1 ${
+            <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm border ${
               isOnline 
-                ? 'bg-brand-teal-50 text-brand-teal-650' 
-                : 'bg-brand-sand-200 text-brand-sand-700'
+                ? 'bg-brand-teal-50 text-brand-teal-650 border-brand-teal-200/20' 
+                : 'bg-brand-sand-200 text-brand-sand-700 border-brand-sand-300/30'
             }`}>
               {isOnline ? (
                 <>
-                  <Wifi className="h-3 w-3" />
+                  <Wifi className="h-3.5 w-3.5 text-brand-teal-500" />
                   En línea
                 </>
               ) : (
                 <>
-                  <WifiOff className="h-3 w-3" />
+                  <WifiOff className="h-3.5 w-3.5 text-brand-sand-500" />
                   Local
                 </>
               )}
@@ -410,55 +414,48 @@ export default function App() {
         </div>
       </main>
 
-      {/* RESPONSIVE BOTTOM NAVIGATION (Fixed at bottom for mobile, styled beautifully) */}
-      <nav className="glass fixed bottom-0 left-0 right-0 border-t border-brand-earth-100 shadow-lg md:max-w-md md:mx-auto md:bottom-4 md:rounded-3xl z-40">
-        <div className="grid grid-cols-4 py-2 px-1 text-center">
+      {/* RESPONSIVE BOTTOM NAVIGATION (Floating Dock with sliding active indicator) */}
+      <nav className="fixed bottom-5 left-4 right-4 md:max-w-md md:mx-auto rounded-2xl glass shadow-xl border border-brand-earth-150/40 z-45 bg-white/70 backdrop-blur-md">
+        {(() => {
+          const tabs = [
+            { id: 'dashboard' as const, label: 'Hoy', icon: Calendar },
+            { id: 'log' as const, label: 'Registrar', icon: ClipboardList },
+            { id: 'history' as const, label: 'Bitácora', icon: Database },
+            { id: 'settings' as const, label: 'Ajustes', icon: SettingsIcon }
+          ];
+          const activeIndex = tabs.findIndex(t => t.id === activeTab);
           
-          <button
-            type="button"
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
-              activeTab === 'dashboard' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
-            }`}
-          >
-            <Calendar className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'dashboard' ? 'scale-110' : ''}`} />
-            <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Hoy</span>
-          </button>
+          return (
+            <div className="relative grid grid-cols-4 py-2.5 px-2 text-center items-center">
+              {/* Sliding Pill Background Indicator */}
+              <div 
+                className="absolute top-1.5 bottom-1.5 rounded-xl bg-brand-teal-500/10 border border-brand-teal-500/15 transition-all duration-300 ease-out -z-10"
+                style={{
+                  width: 'calc(25% - 12px)',
+                  left: `calc(${activeIndex * 25}% + 6px)`,
+                }}
+              />
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('log')}
-            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
-              activeTab === 'log' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
-            }`}
-          >
-            <ClipboardList className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'log' ? 'scale-110' : ''}`} />
-            <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Registrar</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('history')}
-            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
-              activeTab === 'history' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
-            }`}
-          >
-            <Database className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'history' ? 'scale-110' : ''}`} />
-            <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Bitácora</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('settings')}
-            className={`flex flex-col items-center justify-center py-1 transition-all active-press ${
-              activeTab === 'settings' ? 'text-brand-teal-600 scale-105 font-bold' : 'text-brand-earth-500 hover:text-brand-earth-700'
-            }`}
-          >
-            <SettingsIcon className={`h-5 w-5 transition-transform duration-200 ${activeTab === 'settings' ? 'scale-110' : ''}`} />
-            <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">Ajustes</span>
-          </button>
-
-        </div>
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative flex flex-col items-center justify-center py-1 transition-all active-press ${
+                      isActive ? 'text-brand-teal-700 font-extrabold scale-105' : 'text-brand-earth-500 hover:text-brand-earth-700'
+                    }`}
+                  >
+                    <Icon className={`h-5 w-5 transition-all duration-300 ${isActive ? 'scale-110 text-brand-teal-600 rotate-3' : ''}`} />
+                    <span className="text-[9px] font-bold mt-1 uppercase tracking-wider">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
       </nav>
 
     </div>

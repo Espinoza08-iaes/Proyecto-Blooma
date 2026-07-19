@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { db, type Profile } from '../db/db';
 import { Shield, Bell, Database, Trash2, Download, RefreshCw, LifeBuoy, LogOut, KeyRound, Mail, Palette, Type } from 'lucide-react';
 import { apiLogin, apiRegister, syncLocalDataWithServer, apiDeleteAccount, apiUpdateProfile } from '../db/supabase';
+import BloomaLogo from '../components/BloomaLogo';
 
 interface SettingsProps {
   profile: Profile;
@@ -313,22 +314,22 @@ export default function Settings({ profile, onProfileUpdate, onResetApp, authTok
           </label>
           <div className="grid grid-cols-4 gap-2.5">
             {[
-              { id: 'sprout', name: 'Brote', emoji: '🌱' },
-              { id: 'flower', name: 'Flor', emoji: '🌸' },
-              { id: 'butterfly', name: 'Mariposa', emoji: '🦋' },
-              { id: 'sun', name: 'Sol', emoji: '☀️' }
+              { id: 'sprout' as const, name: 'Brote' },
+              { id: 'flower' as const, name: 'Flor' },
+              { id: 'butterfly' as const, name: 'Mariposa' },
+              { id: 'sun' as const, name: 'Sol' }
             ].map(ic => (
               <button
                 key={ic.id}
                 type="button"
-                onClick={() => saveSettings({ appIcon: ic.id as any })}
-                className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition-all active-press ${
+                onClick={() => saveSettings({ appIcon: ic.id })}
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-bold transition-all active-press ${
                   (profile.appIcon || 'sprout') === ic.id
                     ? 'bg-brand-teal-50 border-brand-teal-650 text-brand-teal-900 shadow-sm'
                     : 'bg-white border-brand-earth-200 text-brand-earth-700 hover:bg-brand-earth-50'
                 }`}
               >
-                <span className="text-xl">{ic.emoji}</span>
+                <BloomaLogo variant={ic.id} className="h-7 w-7 text-brand-teal-600 mb-0.5" />
                 <span className="text-[10px] text-brand-earth-650 font-bold">{ic.name}</span>
               </button>
             ))}
