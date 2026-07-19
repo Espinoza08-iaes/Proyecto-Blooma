@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { db, type Profile } from '../db/db';
-import { Shield, Bell, Database, Trash2, Download, RefreshCw, LifeBuoy, LogOut, KeyRound, Mail } from 'lucide-react';
+import { Shield, Bell, Database, Trash2, Download, RefreshCw, LifeBuoy, LogOut, KeyRound, Mail, Palette, Type } from 'lucide-react';
 import { apiLogin, apiRegister, syncLocalDataWithServer, apiDeleteAccount, apiUpdateProfile } from '../db/supabase';
 
 interface SettingsProps {
@@ -238,6 +238,101 @@ export default function Settings({ profile, onProfileUpdate, onResetApp, authTok
               {s === 'cycle' ? 'Ciclo Menstrual' : s === 'pregnancy' ? 'Embarazo' : 'Menopausia'}
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* PERSONALIZACIÓN */}
+      <section className="glass rounded-3xl p-6 shadow-md border border-brand-earth-100 space-y-4 card-hover">
+        <div className="flex items-center gap-3 border-b border-brand-earth-100 pb-3">
+          <Palette className="h-5 w-5 text-brand-teal-650" />
+          <h2 className="font-bold text-brand-earth-900">Personalización del Espacio</h2>
+        </div>
+        <p className="text-xs text-brand-earth-650 leading-relaxed">
+          Ajusta los colores, el tamaño de la letra y el logotipo de la aplicación para hacer de Blooma tu propio espacio íntimo y cómodo.
+        </p>
+
+        {/* Color Theme Selector */}
+        <div className="space-y-2">
+          <label className="block text-[10px] font-extrabold text-brand-earth-500 uppercase tracking-wider">
+            Paleta de Colores
+          </label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {[
+              { id: 'earth', name: 'Tierra', preview: 'bg-[#a06a50]' },
+              { id: 'orchid', name: 'Orquídea', preview: 'bg-[#d946ef]' },
+              { id: 'forest', name: 'Bosque', preview: 'bg-[#22c55e]' },
+              { id: 'ocean', name: 'Océano', preview: 'bg-[#0ea5e9]' }
+            ].map(t => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => saveSettings({ themeColor: t.id as any })}
+                className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all active-press ${
+                  (profile.themeColor || 'earth') === t.id
+                    ? 'bg-brand-teal-50 border-brand-teal-600 text-brand-teal-900 shadow-sm'
+                    : 'bg-white border-brand-earth-200 text-brand-earth-700 hover:bg-brand-earth-50'
+                }`}
+              >
+                <span className={`w-3.5 h-3.5 rounded-full ${t.preview} flex-shrink-0 shadow-sm`} />
+                <span>{t.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Text Size Selector */}
+        <div className="space-y-2 pt-2">
+          <label className="block text-[10px] font-extrabold text-brand-earth-500 uppercase tracking-wider">
+            Tamaño del Texto
+          </label>
+          <div className="flex gap-3">
+            {[
+              { id: 'normal', name: 'Normal' },
+              { id: 'large', name: 'Grande' }
+            ].map(sz => (
+              <button
+                key={sz.id}
+                type="button"
+                onClick={() => saveSettings({ themeTextSize: sz.id as any })}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition-all active-press ${
+                  (profile.themeTextSize || 'normal') === sz.id
+                    ? 'bg-brand-teal-600 border-brand-teal-700 text-white shadow-sm'
+                    : 'bg-white border-brand-earth-200 text-brand-earth-700 hover:bg-brand-earth-50'
+                }`}
+              >
+                {sz.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* App Icon Picker */}
+        <div className="space-y-2 pt-2">
+          <label className="block text-[10px] font-extrabold text-brand-earth-500 uppercase tracking-wider">
+            Logotipo de la App
+          </label>
+          <div className="grid grid-cols-4 gap-2.5">
+            {[
+              { id: 'sprout', name: 'Brote', emoji: '🌱' },
+              { id: 'flower', name: 'Flor', emoji: '🌸' },
+              { id: 'butterfly', name: 'Mariposa', emoji: '🦋' },
+              { id: 'sun', name: 'Sol', emoji: '☀️' }
+            ].map(ic => (
+              <button
+                key={ic.id}
+                type="button"
+                onClick={() => saveSettings({ appIcon: ic.id as any })}
+                className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border text-xs font-bold transition-all active-press ${
+                  (profile.appIcon || 'sprout') === ic.id
+                    ? 'bg-brand-teal-50 border-brand-teal-650 text-brand-teal-900 shadow-sm'
+                    : 'bg-white border-brand-earth-200 text-brand-earth-700 hover:bg-brand-earth-50'
+                }`}
+              >
+                <span className="text-xl">{ic.emoji}</span>
+                <span className="text-[10px] text-brand-earth-650 font-bold">{ic.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

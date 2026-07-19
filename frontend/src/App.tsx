@@ -70,6 +70,24 @@ export default function App() {
     };
   }, []);
 
+  // Apply personalization styles to document element
+  useEffect(() => {
+    if (!profile) return;
+    
+    // 1. Manage theme color class on body
+    const bodyEl = document.body;
+    bodyEl.classList.remove('theme-earth', 'theme-orchid', 'theme-forest', 'theme-ocean');
+    const activeTheme = profile.themeColor || 'earth';
+    bodyEl.classList.add(`theme-${activeTheme}`);
+
+    // 2. Manage text size class on body
+    if (profile.themeTextSize === 'large') {
+      bodyEl.classList.add('text-large');
+    } else {
+      bodyEl.classList.remove('text-large');
+    }
+  }, [profile?.themeColor, profile?.themeTextSize]);
+
   const handleOnboardingComplete = (newProfile: Profile) => {
     setProfile(newProfile);
     setPinVerified(true);
@@ -217,7 +235,10 @@ export default function App() {
       <header className="glass sticky top-0 z-40 border-b border-brand-earth-100/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 active-press cursor-pointer">
-            <span className="text-2xl animate-pulse-soft">🌱</span>
+            {profile?.appIcon === 'flower' && <span className="text-2xl animate-pulse-soft">🌸</span>}
+            {profile?.appIcon === 'butterfly' && <span className="text-2xl animate-pulse-soft">🦋</span>}
+            {profile?.appIcon === 'sun' && <span className="text-2xl animate-pulse-soft">☀️</span>}
+            {(!profile?.appIcon || profile?.appIcon === 'sprout') && <span className="text-2xl animate-pulse-soft">🌱</span>}
             <span className="font-extrabold text-lg text-brand-earth-900 tracking-tight font-display">Blooma</span>
           </div>
 

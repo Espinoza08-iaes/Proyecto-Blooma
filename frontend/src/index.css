@@ -5,8 +5,109 @@
 @tailwind utilities;
 
 @layer base {
+  :root, .theme-earth {
+    --color-primary-50: #f0fdfa;
+    --color-primary-100: #ccfbf1;
+    --color-primary-200: #99f6e4;
+    --color-primary-300: #5eead4;
+    --color-primary-400: #2dd4bf;
+    --color-primary-500: #14b8a6;
+    --color-primary-600: #0d9488;
+    --color-primary-700: #0f766e;
+    --color-primary-800: #115e59;
+    --color-primary-900: #134e4a;
+    
+    --color-earth-50: #faf8f5;
+    --color-earth-100: #f5ebe0;
+    --color-earth-200: #e3d5ca;
+    --color-earth-300: #d5bdaf;
+    --color-earth-400: #b5838d;
+    --color-earth-500: #a06a50;
+    --color-earth-600: #8c593f;
+    --color-earth-700: #6f4430;
+    --color-earth-800: #533222;
+    --color-earth-900: #382014;
+  }
+
+  .theme-orchid {
+    --color-primary-50: #fdf4ff;
+    --color-primary-100: #f5d0fe;
+    --color-primary-200: #f0abfc;
+    --color-primary-300: #e879f9;
+    --color-primary-400: #e879f9;
+    --color-primary-500: #d946ef;
+    --color-primary-600: #c026d3;
+    --color-primary-700: #a21caf;
+    --color-primary-800: #86198f;
+    --color-primary-900: #701a75;
+    
+    --color-earth-50: #fff0f6;
+    --color-earth-100: #ffdeeb;
+    --color-earth-200: #fcc2d7;
+    --color-earth-300: #faa2c1;
+    --color-earth-400: #f783ac;
+    --color-earth-500: #e64980;
+    --color-earth-600: #d6336c;
+    --color-earth-700: #c2255c;
+    --color-earth-800: #a61e4d;
+    --color-earth-900: #490e2f;
+  }
+
+  .theme-forest {
+    --color-primary-50: #f0fdf4;
+    --color-primary-100: #dcfce7;
+    --color-primary-200: #bbf7d0;
+    --color-primary-300: #86efac;
+    --color-primary-400: #4ade80;
+    --color-primary-500: #22c55e;
+    --color-primary-600: #16a34a;
+    --color-primary-700: #15803d;
+    --color-primary-800: #166534;
+    --color-primary-900: #14532d;
+    
+    --color-earth-50: #f4fbf7;
+    --color-earth-100: #e3f2e9;
+    --color-earth-200: #cbe6d5;
+    --color-earth-300: #a9d2b8;
+    --color-earth-400: #8bbfa0;
+    --color-earth-500: #559c73;
+    --color-earth-600: #44805c;
+    --color-earth-700: #356649;
+    --color-earth-800: #254b35;
+    --color-earth-900: #12281a;
+  }
+
+  .theme-ocean {
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+    
+    --color-earth-50: #f0f4f8;
+    --color-earth-100: #dce4ec;
+    --color-earth-200: #bdccd8;
+    --color-earth-300: #9fb2c5;
+    --color-earth-400: #8099b2;
+    --color-earth-500: #557291;
+    --color-earth-600: #435b75;
+    --color-earth-700: #33465b;
+    --color-earth-800: #243241;
+    --color-earth-900: #121c26;
+  }
+
   body {
     @apply bg-brand-earth-50 text-brand-earth-900 font-sans antialiased min-h-screen selection:bg-brand-teal-200 selection:text-brand-teal-900 overflow-x-hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .text-large {
+    font-size: 112.5% !important;
   }
 }
 

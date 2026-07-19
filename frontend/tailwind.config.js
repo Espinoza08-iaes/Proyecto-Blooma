@@ -9,28 +9,28 @@ export default {
       colors: {
         brand: {
           teal: {
-            50: '#f0fdfa',
-            100: '#ccfbf1',
-            200: '#99f6e4',
-            300: '#5eead4',
-            400: '#2dd4bf',
-            500: '#14b8a6', // Principal
-            600: '#0d9488',
-            700: '#0f766e',
-            800: '#115e59',
-            900: '#134e4a',
+            50: 'var(--color-primary-50)',
+            100: 'var(--color-primary-100)',
+            200: 'var(--color-primary-200)',
+            300: 'var(--color-primary-300)',
+            400: 'var(--color-primary-400)',
+            500: 'var(--color-primary-500)',
+            600: 'var(--color-primary-600)',
+            700: 'var(--color-primary-700)',
+            800: 'var(--color-primary-800)',
+            900: 'var(--color-primary-900)',
           },
           earth: {
-            50: '#faf8f5', // Background claro y cálido
-            100: '#f5ebe0',
-            200: '#e3d5ca',
-            300: '#d5bdaf',
-            400: '#b5838d',
-            500: '#a06a50', // Tono tierra principal
-            600: '#8c593f',
-            700: '#6f4430',
-            800: '#533222',
-            900: '#382014',
+            50: 'var(--color-earth-50)',
+            100: 'var(--color-earth-100)',
+            200: 'var(--color-earth-200)',
+            300: 'var(--color-earth-300)',
+            400: 'var(--color-earth-400)',
+            500: 'var(--color-earth-500)',
+            600: 'var(--color-earth-600)',
+            700: 'var(--color-earth-700)',
+            800: 'var(--color-earth-800)',
+            900: 'var(--color-earth-900)',
           },
           coral: {
             50: '#fff5f5',

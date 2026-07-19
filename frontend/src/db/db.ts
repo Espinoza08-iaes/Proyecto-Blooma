@@ -12,6 +12,9 @@ export interface Profile {
   lastPeriodDate?: string;
   gestationWeekStart?: string; // For pregnancy stage
   menopauseStartYear?: string; // For menopause stage
+  themeColor?: 'earth' | 'orchid' | 'forest' | 'ocean';
+  themeTextSize?: 'normal' | 'large';
+  appIcon?: 'sprout' | 'flower' | 'butterfly' | 'sun';
 }
 
 export interface Cycle {
