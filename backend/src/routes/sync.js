@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { authMiddleware } from '../auth.js';
+import { supabase } from '../supabaseClient.js';
 
 const router = express.Router();
 
@@ -9,16 +10,224 @@ router.post('/', authMiddleware, async (req, res) => {
   const { cycles = [], dailyLogs = [], triageRecords = [] } = req.body;
   const userId = req.userId;
 
+  // --- SUPABASE SYNC MODE ---
+  if (supabase) {
+    try {
+      // 1. Fetch current server status
+      const { data: dbCycles = [] } = await supabase
+        .from('ciclos')
+        .select('*')
+        .eq('user_id', userId);
+
+      const { data: dbDailyLogs = [] } = await supabase
+        .from('daily_logs')
+        .select('*')
+        .eq('user_id', userId);
+
+      const { data: dbTriage = [] } = await supabase
+        .from('registros_embarazo')
+        .select('*')
+        .eq('user_id', userId);
+
+      // --- SYNC CYCLES ---
+      for (const clientCycle of cycles) {
+        const serverMatch = dbCycles.find(c => c.start_date === clientCycle.startDate);
+
+        if (serverMatch) {
+          const clientTime = new Date(clientCycle.updatedAt || 0).getTime();
+          const serverTime = new Date(serverMatch.updated_at || 0).getTime();
+
+          if (clientCycle.deleted) {
+            if (clientTime > serverTime) {
+              await supabase
+                .from('ciclos')
+                .delete()
+                .eq('user_id', userId)
+                .eq('start_date', clientCycle.startDate);
+            }
+          } else if (clientTime > serverTime) {
+            await supabase
+              .from('ciclos')
+              .update({
+                end_date: clientCycle.endDate,
+                duration: clientCycle.duration,
+                updated_at: clientCycle.updatedAt || new Date().toISOString()
+              })
+              .eq('user_id', userId)
+              .eq('start_date', clientCycle.startDate);
+          }
+        } else if (!clientCycle.deleted) {
+          await supabase
+            .from('ciclos')
+            .insert({
+              user_id: userId,
+              start_date: clientCycle.startDate,
+              end_date: clientCycle.endDate,
+              duration: clientCycle.duration,
+              updated_at: clientCycle.updatedAt || new Date().toISOString()
+            });
+        }
+      }
+
+      // --- SYNC DAILY LOGS ---
+      for (const clientLog of dailyLogs) {
+        const serverMatch = dbDailyLogs.find(l => l.date === clientLog.date);
+
+        if (serverMatch) {
+          const clientTime = new Date(clientLog.updatedAt || 0).getTime();
+          const serverTime = new Date(serverMatch.updated_at || 0).getTime();
+
+          if (clientLog.deleted) {
+            if (clientTime > serverTime) {
+              await supabase
+                .from('daily_logs')
+                .delete()
+                .eq('user_id', userId)
+                .eq('date', clientLog.date);
+            }
+          } else if (clientTime > serverTime) {
+            await supabase
+              .from('daily_logs')
+              .update({
+                mood: clientLog.mood,
+                notes: clientLog.notes,
+                flow: clientLog.flow,
+                pain: clientLog.pain,
+                temperature: clientLog.temperature,
+                hot_flashes: clientLog.hotFlashes,
+                sleep_quality: clientLog.sleepQuality,
+                anxiety_level: clientLog.anxietyLevel,
+                updated_at: clientLog.updatedAt || new Date().toISOString()
+              })
+              .eq('user_id', userId)
+              .eq('date', clientLog.date);
+          }
+        } else if (!clientLog.deleted) {
+          await supabase
+            .from('daily_logs')
+            .insert({
+              user_id: userId,
+              date: clientLog.date,
+              mood: clientLog.mood,
+              notes: clientLog.notes,
+              flow: clientLog.flow,
+              pain: clientLog.pain,
+              temperature: clientLog.temperature,
+              hot_flashes: clientLog.hotFlashes,
+              sleep_quality: clientLog.sleepQuality,
+              anxiety_level: clientLog.anxietyLevel,
+              updated_at: clientLog.updatedAt || new Date().toISOString()
+            });
+        }
+      }
+
+      // --- SYNC TRIAGE RECORDS ---
+      for (const clientTriage of triageRecords) {
+        const serverMatch = dbTriage.find(t => t.date === clientTriage.date);
+
+        if (serverMatch) {
+          const clientTime = new Date(clientTriage.updatedAt || 0).getTime();
+          const serverTime = new Date(serverMatch.updated_at || 0).getTime();
+
+          if (clientTriage.deleted) {
+            if (clientTime > serverTime) {
+              await supabase
+                .from('registros_embarazo')
+                .delete()
+                .eq('user_id', userId)
+                .eq('date', clientTriage.date);
+            }
+          } else if (clientTime > serverTime) {
+            await supabase
+              .from('registros_embarazo')
+              .update({
+                gestation_week: clientTriage.gestationWeek,
+                symptoms: clientTriage.symptoms,
+                classification: clientTriage.classification,
+                notes: clientTriage.notes,
+                updated_at: clientTriage.updatedAt || new Date().toISOString()
+              })
+              .eq('user_id', userId)
+              .eq('date', clientTriage.date);
+          }
+        } else if (!clientTriage.deleted) {
+          await supabase
+            .from('registros_embarazo')
+            .insert({
+              user_id: userId,
+              date: clientTriage.date,
+              gestation_week: clientTriage.gestationWeek,
+              symptoms: clientTriage.symptoms,
+              classification: clientTriage.classification,
+              notes: clientTriage.notes,
+              updated_at: clientTriage.updatedAt || new Date().toISOString()
+            });
+        }
+      }
+
+      // Fetch fresh sets from Supabase
+      const { data: freshCycles = [] } = await supabase
+        .from('ciclos')
+        .select('*')
+        .eq('user_id', userId);
+
+      const { data: freshDailyLogs = [] } = await supabase
+        .from('daily_logs')
+        .select('*')
+        .eq('user_id', userId);
+
+      const { data: freshTriage = [] } = await supabase
+        .from('registros_embarazo')
+        .select('*')
+        .eq('user_id', userId);
+
+      // Map back to camelCase local models
+      res.json({
+        cycles: freshCycles.map(c => ({
+          id: c.id,
+          startDate: c.start_date,
+          endDate: c.end_date,
+          duration: c.duration,
+          updatedAt: c.updated_at
+        })),
+        dailyLogs: freshDailyLogs.map(l => ({
+          id: l.id,
+          date: l.date,
+          mood: l.mood,
+          notes: l.notes,
+          flow: l.flow,
+          pain: l.pain,
+          temperature: l.temperature,
+          hotFlashes: l.hot_flashes,
+          sleepQuality: l.sleep_quality,
+          anxietyLevel: l.anxiety_level,
+          updatedAt: l.updated_at
+        })),
+        triageRecords: freshTriage.map(t => ({
+          id: t.id,
+          date: t.date,
+          gestationWeek: t.gestation_week,
+          symptoms: t.symptoms,
+          classification: t.classification,
+          notes: t.notes,
+          updatedAt: t.updated_at
+        })),
+        timestamp: new Date().toISOString()
+      });
+      return;
+    } catch (error) {
+      console.error('Supabase Sync error:', error);
+      return res.status(500).json({ error: 'Error durante la sincronización con la nube.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const serverCycles = await db.getCycles();
     const serverDailyLogs = await db.getDailyLogs();
     const serverTriageRecords = await db.getTriageRecords();
 
-    // --- SYNC CYCLES ---
-    const userServerCycles = serverCycles.filter(c => c.userId === userId);
-    const updatedCycles = [];
-
-    // Process client cycles
+    // Sync Cycles
     for (const clientCycle of cycles) {
       const serverMatchIndex = serverCycles.findIndex(
         c => c.userId === userId && c.startDate === clientCycle.startDate
@@ -30,12 +239,10 @@ router.post('/', authMiddleware, async (req, res) => {
         const serverTime = new Date(serverCycle.updatedAt || 0).getTime();
 
         if (clientCycle.deleted) {
-          // Client deleted it
           if (clientTime > serverTime) {
             serverCycles.splice(serverMatchIndex, 1);
           }
         } else if (clientTime > serverTime) {
-          // Client has newer version
           serverCycles[serverMatchIndex] = {
             ...serverCycle,
             endDate: clientCycle.endDate,
@@ -44,7 +251,6 @@ router.post('/', authMiddleware, async (req, res) => {
           };
         }
       } else if (!clientCycle.deleted) {
-        // New client cycle, add to server
         serverCycles.push({
           userId,
           startDate: clientCycle.startDate,
@@ -55,7 +261,7 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     }
 
-    // --- SYNC DAILY LOGS ---
+    // Sync Daily Logs
     for (const clientLog of dailyLogs) {
       const serverMatchIndex = serverDailyLogs.findIndex(
         l => l.userId === userId && l.date === clientLog.date
@@ -101,7 +307,7 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     }
 
-    // --- SYNC TRIAGE RECORDS ---
+    // Sync Triage Records
     for (const clientTriage of triageRecords) {
       const serverMatchIndex = serverTriageRecords.findIndex(
         t => t.userId === userId && t.date === clientTriage.date
@@ -139,10 +345,8 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     }
 
-    // Save changes to disk
     await db.commit();
 
-    // Retrieve fresh lists to send back to client
     const freshCycles = serverCycles.filter(c => c.userId === userId);
     const freshDailyLogs = serverDailyLogs.filter(l => l.userId === userId);
     const freshTriageRecords = serverTriageRecords.filter(t => t.userId === userId);

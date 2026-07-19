@@ -1,5 +1,6 @@
 import express from 'express';
 import { db } from '../db.js';
+import { supabase } from '../supabaseClient.js';
 
 const router = express.Router();
 
@@ -7,6 +8,29 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const { department } = req.query;
 
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      let query = supabase.from('casas_maternas').select('*');
+
+      if (department && department !== 'Todos') {
+        query = query.ilike('department', department.toString());
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      return res.json(data);
+    } catch (error) {
+      console.error('Supabase Casas Maternas error:', error);
+      return res.status(500).json({ error: 'Error al recuperar Casas Maternas de la nube.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const houses = await db.getMaternalHouses();
     

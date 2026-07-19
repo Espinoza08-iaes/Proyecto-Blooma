@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../db.js';
 import { hashPassword, verifyPassword, generateToken, authMiddleware } from '../auth.js';
+import { supabase } from '../supabaseClient.js';
 
 const router = express.Router();
 
@@ -12,6 +13,39 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'El correo y la contraseña son requeridos.' });
   }
 
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.admin.createUser({
+        email: email.toLowerCase(),
+        password,
+        email_confirm: true
+      });
+
+      if (error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      const userId = data.user.id;
+      const token = generateToken({ userId });
+
+      res.status(201).json({
+        message: 'Usuario registrado con éxito en la nube.',
+        token,
+        profile: {
+          stage: 'cycle',
+          optInSync: false,
+          pinEnabled: false
+        }
+      });
+      return;
+    } catch (error) {
+      console.error('Supabase registration error:', error);
+      return res.status(500).json({ error: 'Error al registrar en Supabase.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const users = await db.getUsers();
     const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -49,7 +83,7 @@ router.post('/register', async (req, res) => {
 
     const token = generateToken({ userId });
     res.status(201).json({
-      message: 'Usuario registrado con éxito.',
+      message: 'Usuario registrado con éxito localmente.',
       token,
       profile: {
         stage: newProfile.stage,
@@ -58,7 +92,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Local registration error:', error);
     res.status(500).json({ error: 'Error interno del servidor al registrar.' });
   }
 });
@@ -71,6 +105,55 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'El correo y la contraseña son requeridos.' });
   }
 
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase(),
+        password
+      });
+
+      if (error) {
+        return res.status(401).json({ error: 'Credenciales inválidas en la nube.' });
+      }
+
+      const userId = data.user.id;
+      
+      // Fetch profile from perfiles table
+      const { data: profile, error: profileError } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      const profileData = profile || {
+        stage: 'cycle',
+        opt_in_sync: false,
+        pin_enabled: false
+      };
+
+      const token = generateToken({ userId });
+
+      res.json({
+        message: 'Inicio de sesión exitoso en la nube.',
+        token,
+        profile: {
+          stage: profileData.stage,
+          optInSync: profileData.opt_in_sync,
+          pinEnabled: profileData.pin_enabled,
+          age: profileData.age,
+          gestationWeekStart: profileData.gestation_week_start,
+          menopauseStartYear: profileData.menopause_start_year
+        }
+      });
+      return;
+    } catch (error) {
+      console.error('Supabase login error:', error);
+      return res.status(500).json({ error: 'Error al iniciar sesión con Supabase.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const users = await db.getUsers();
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -110,6 +193,38 @@ router.post('/login', async (req, res) => {
 
 // Get profile
 router.get('/profile', authMiddleware, async (req, res) => {
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', req.userId)
+        .single();
+
+      if (error || !data) {
+        return res.status(404).json({ error: 'Perfil no encontrado en la nube.' });
+      }
+
+      res.json({
+        userId: data.id,
+        stage: data.stage,
+        age: data.age,
+        gestationWeekStart: data.gestation_week_start,
+        menopauseStartYear: data.menopause_start_year,
+        optInSync: data.opt_in_sync,
+        pinEnabled: data.pin_enabled,
+        discreteMode: data.discrete_mode,
+        offlineMode: data.offline_mode
+      });
+      return;
+    } catch (error) {
+      console.error('Supabase profile get error:', error);
+      return res.status(500).json({ error: 'Error al recuperar perfil de la nube.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const profiles = await db.getProfiles();
     const profile = profiles.find(p => p.userId === req.userId);
@@ -118,7 +233,6 @@ router.get('/profile', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Perfil no encontrado.' });
     }
 
-    // Don't send raw pin code back if you want, but for sync or validation we can strip or keep it
     const { pinCode, ...safeProfile } = profile;
     res.json(safeProfile);
   } catch (error) {
@@ -128,8 +242,40 @@ router.get('/profile', authMiddleware, async (req, res) => {
 
 // Update profile
 router.post('/profile', authMiddleware, async (req, res) => {
-  const { stage, age, gestationWeekStart, menopauseStartYear, optInSync, pinEnabled, pinCode } = req.body;
+  const { stage, age, gestationWeekStart, menopauseStartYear, optInSync, pinEnabled, pinCode, discreteMode, offlineMode } = req.body;
 
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('perfiles')
+        .upsert({
+          id: req.userId,
+          stage,
+          age,
+          gestation_week_start: gestationWeekStart,
+          menopause_start_year: menopauseStartYear,
+          opt_in_sync: optInSync,
+          pin_enabled: pinEnabled,
+          pin_code: pinCode,
+          discrete_mode: discreteMode,
+          offline_mode: offlineMode,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      res.json({ message: 'Perfil actualizado con éxito en la nube.' });
+      return;
+    } catch (error) {
+      console.error('Supabase profile update error:', error);
+      return res.status(500).json({ error: 'Error al actualizar perfil en la nube.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
   try {
     const profiles = await db.getProfiles();
     let profileIndex = profiles.findIndex(p => p.userId === req.userId);
@@ -144,6 +290,8 @@ router.post('/profile', authMiddleware, async (req, res) => {
         optInSync: optInSync ?? false,
         pinEnabled: pinEnabled ?? false,
         pinCode: pinCode || '',
+        discreteMode: discreteMode ?? false,
+        offlineMode: offlineMode ?? false,
         updatedAt: new Date().toISOString()
       };
       profiles.push(newProfile);
@@ -157,6 +305,8 @@ router.post('/profile', authMiddleware, async (req, res) => {
         optInSync: optInSync !== undefined ? optInSync : profiles[profileIndex].optInSync,
         pinEnabled: pinEnabled !== undefined ? pinEnabled : profiles[profileIndex].pinEnabled,
         pinCode: pinCode !== undefined ? pinCode : profiles[profileIndex].pinCode,
+        discreteMode: discreteMode !== undefined ? discreteMode : profiles[profileIndex].discreteMode,
+        offlineMode: offlineMode !== undefined ? offlineMode : profiles[profileIndex].offlineMode,
         updatedAt: new Date().toISOString()
       };
     }
@@ -169,11 +319,30 @@ router.post('/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// Delete account in cascade (local-first safety guarantee)
+// Delete account in cascade
 router.post('/delete-account', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.userId;
+  const userId = req.userId;
 
+  // --- SUPABASE MODE ---
+  if (supabase) {
+    try {
+      // Deleting auth.users triggers cascade deletes of perfiles, ciclos, daily_logs, etc.
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+
+      if (error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      res.json({ message: 'Cuenta y todos los datos asociados eliminados en cascada de la nube de manera definitiva.' });
+      return;
+    } catch (error) {
+      console.error('Supabase delete account error:', error);
+      return res.status(500).json({ error: 'Error al eliminar la cuenta de la nube.' });
+    }
+  }
+
+  // --- LOCAL FALLBACK MODE ---
+  try {
     // 1. Remove user
     const users = await db.getUsers();
     db.data.users = users.filter(u => u.id !== userId);
@@ -194,7 +363,6 @@ router.post('/delete-account', authMiddleware, async (req, res) => {
     const triageRecords = await db.getTriageRecords();
     db.data.triageRecords = triageRecords.filter(t => t.userId !== userId);
 
-    // Save changes
     await db.commit();
 
     res.json({ message: 'Cuenta y todos los datos asociados eliminados en cascada de manera definitiva.' });

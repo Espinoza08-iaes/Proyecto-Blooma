@@ -9,6 +9,8 @@ import MenopauseDashboard from './views/MenopauseDashboard';
 import History from './views/History';
 import { Shield, Sparkles, Heart, Activity, Check, Settings as SettingsIcon, Calendar, ClipboardList, Database, Wifi, WifiOff } from 'lucide-react';
 
+import { syncLocalDataWithServer } from './db/supabase';
+
 export default function App() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,22 @@ export default function App() {
   
   // Network connection status
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  // Cloud Auth token
+  const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem('blooma_auth_token'));
+
+  // Background cloud synchronization effect
+  useEffect(() => {
+    if (profile?.optInSync && authToken && isOnline) {
+      console.log('Iniciando sincronización automática en segundo plano...');
+      syncLocalDataWithServer(authToken)
+        .then(res => {
+          if (res.success) {
+            console.log('Sincronización en segundo plano exitosa.');
+          }
+        });
+    }
+  }, [profile?.optInSync, authToken, isOnline, activeTab]);
 
   useEffect(() => {
     // Seed houses and load profile
@@ -276,6 +294,8 @@ export default function App() {
               profile={profile} 
               onProfileUpdate={(updated) => setProfile(updated)} 
               onResetApp={handleReset} 
+              authToken={authToken}
+              onTokenUpdate={setAuthToken}
             />
           </div>
         )}

@@ -19,6 +19,8 @@ export interface Cycle {
   startDate: string; // YYYY-MM-DD
   endDate?: string;  // YYYY-MM-DD
   duration?: number; // Days
+  updatedAt?: string;
+  deleted?: boolean;
 }
 
 export interface DailyLog {
@@ -34,6 +36,8 @@ export interface DailyLog {
   hotFlashes?: number; // Count (0-10)
   sleepQuality?: 'good' | 'fair' | 'poor';
   anxietyLevel?: number; // Scale (1-10)
+  updatedAt?: string;
+  deleted?: boolean;
 }
 
 export interface TriageRecord {
@@ -43,6 +47,8 @@ export interface TriageRecord {
   symptoms: string[];
   classification: 'normal' | 'vigilar' | 'urgente';
   notes?: string;
+  updatedAt?: string;
+  deleted?: boolean;
 }
 
 export interface MaternalHouse {
