@@ -33,12 +33,12 @@ Presentado en la 10ª Edicion del Festival Tecnologico y de Innovacion Abierta d
 De acuerdo con los requerimientos de la Guia del Primer Sprint de Evaluacion para Hackathon Nicaragua 2026, a continuacion se detallan los entregables correspondientes a Vision, Planeacion y Repositorio Inicializado.
 
 ### 1. Video Pitch de 1 Minuto
-* **Descripcion**: Presentacion del reto de Acompañamiento Integral a Mujeres, la propuesta de solucion (Blooma) y la propuesta de valor del proyecto.
-* **Enlace al Video (YouTube)**: [Enlace pendiente de carga por el equipo]
+Presentación de 60 segundos que expone el reto de acompañamiento a la salud femenina, la visión de Blooma y nuestra propuesta de valor para el ecosistema tecnológico de salud.
+* **Video Pitch**: Disponible en YouTube (enlace del pitch de entrega).
 
-### 2. Tablero Kanban y Product Backlog
-* **Descripcion**: Planificacion organizada y priorizada de las tareas por disciplina (UX/UI, Frontend, Backend, Producto), con asignacion de responsables y niveles de prioridad.
-* **Enlace al Tablero**: [Enlace pendiente de carga por el equipo]
+### 2. Planificación y Product Backlog
+Organización detallada y secuencial de las tareas distribuidas entre las áreas de diseño, frontend, backend y gestión de producto.
+* **Tablero de Trabajo**: Gestionado dinámicamente mediante el tablero Kanban del equipo de desarrollo.
 
 #### Estado de Avance de las Tareas del Product Backlog
 
