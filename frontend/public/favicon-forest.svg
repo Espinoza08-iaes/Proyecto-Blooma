@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#4ade80" />
+    <stop offset="100%" stop-color="#22c55e" />
+  </linearGradient>
+  <linearGradient id="g2" x1="100%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#a9d2b8" />
+    <stop offset="100%" stop-color="#559c73" />
+  </linearGradient>
+  <circle cx="50" cy="50" r="16" fill="url(#g1)" />
+  <path d="M50 15 C58 35, 42 35, 50 15 Z" fill="url(#g2)" opacity="0.85" />
+  <path d="M50 85 C58 65, 42 65, 50 85 Z" fill="url(#g2)" opacity="0.85" />
+  <path d="M15 50 C35 58, 35 42, 15 50 Z" fill="url(#g1)" opacity="0.85" />
+  <path d="M85 50 C65 58, 65 42, 85 50 Z" fill="url(#g1)" opacity="0.85" />
+  <path d="M25 25 C40 38, 30 42, 25 25 Z" fill="url(#g2)" opacity="0.7" />
+  <path d="M75 75 C60 62, 70 58, 75 75 Z" fill="url(#g2)" opacity="0.7" />
+  <path d="M75 25 C60 38, 70 42, 75 25 Z" fill="url(#g1)" opacity="0.7" />
+  <path d="M25 75 C40 62, 30 58, 25 75 Z" fill="url(#g1)" opacity="0.7" />
+</svg>
