@@ -57,7 +57,7 @@ De acuerdo con los requerimientos del Primer Sprint de Evaluación para Hackatho
 ### 1. Video Pitch de 1 Minuto
 Presentación sintética de 60 segundos configurada en modo Oculto en YouTube, exponiendo la problemática atendida, la arquitectura tecnológica y la propuesta de valor del sistema, contando con la participación del integrante designado como presentador (Kevin Gael Torrez Urbina).
 
-* **Enlace al Video (YouTube)**: [Ver Video Pitch de 1 Minuto](https://www.youtube.com/watch?v=XXXXXXXXXXX)
+* **Enlace al Video (YouTube)**: [Ver Video Pitch de 1 Minuto](https://youtube.com/shorts/qLHfupRCO-Q?si=O0pgQD1246XFiipS)
 
 ### 2. Tablero de Trabajo y Product Backlog
 Organización secuencial de entregables y tareas distribuidas entre las distintas disciplinas del equipo.
