@@ -1,17 +1,45 @@
 import crypto from 'crypto';
+import util from 'util';
+import dotenv from 'dotenv';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'blooma-secure-local-secret-key-2026';
+dotenv.config();
 
-// Password utility
-export function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-  return { hash, salt };
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('❌ Error de Seguridad: Falta JWT_SECRET. Defínela en backend/.env o en las variables de entorno antes de arrancar.');
 }
 
-export function verifyPassword(password, hash, salt) {
-  const checkHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-  return hash === checkHash;
+const pbkdf2Async = util.promisify(crypto.pbkdf2);
+const PBKDF2_ITERATIONS = 210000;
+const KEY_LENGTH = 64;
+const DIGEST = 'sha512';
+const DUMMY_SALT = '00'.repeat(16);
+const DUMMY_HASH = '00'.repeat(64);
+
+export function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+// Password utility (Async OWASP PBKDF2 con 210,000 iteraciones)
+export async function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derived = await pbkdf2Async(password, salt, PBKDF2_ITERATIONS, KEY_LENGTH, DIGEST);
+  return { hash: derived.toString('hex'), salt };
+}
+
+export async function verifyPassword(password, hash, salt) {
+  // Siempre derivar el hash (incluso ante usuarios inexistentes) para mitigar oráculos de tiempo
+  const targetSalt = salt || DUMMY_SALT;
+  const targetHash = hash || DUMMY_HASH;
+  const derived = await pbkdf2Async(password, targetSalt, PBKDF2_ITERATIONS, KEY_LENGTH, DIGEST);
+  const derivedHex = derived.toString('hex');
+  
+  const isMatch = safeEqual(derivedHex, targetHash);
+  return Boolean(hash && salt && isMatch);
 }
 
 // Custom lightweight JWT helper
@@ -29,7 +57,7 @@ export function generateToken(payload) {
 }
 
 export function verifyToken(token) {
-  if (!token) return null;
+  if (!token || typeof token !== 'string') return null;
   const parts = token.split('.');
   if (parts.length !== 3) return null;
   
@@ -39,7 +67,7 @@ export function verifyToken(token) {
     .update(`${header}.${payload}`)
     .digest('base64url');
     
-  if (signature !== expectedSignature) return null;
+  if (!safeEqual(signature, expectedSignature)) return null;
   
   try {
     const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 170" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hPrimaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="hSecondaryGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff758f"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <filter id="hGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    .h-brand-title {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 58px;
+      font-weight: 800;
+      fill: #0f172a;
+      letter-spacing: 5px;
+    }
+    .h-brand-subtitle {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      fill: #0d9488;
+      letter-spacing: 3px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .h-brand-title {
+        fill: #ffffff;
+      }
+      .h-brand-subtitle {
+        fill: #2dd4bf;
+      }
+    }
+  </style>
+
+  <!-- Isotipo Izquierda -->
+  <g transform="translate(30, 20) scale(1.3)">
+    <circle cx="50" cy="50" r="16" fill="url(#hPrimaryGrad)" filter="url(#hGlow)"/>
+    <path d="M50 12 C60 35, 40 35, 50 12 Z" fill="url(#hSecondaryGrad)" opacity="0.95" />
+    <path d="M50 88 C60 65, 40 65, 50 88 Z" fill="url(#hSecondaryGrad)" opacity="0.95" />
+    <path d="M12 50 C35 60, 35 40, 12 50 Z" fill="url(#hPrimaryGrad)" opacity="0.95" />
+    <path d="M88 50 C65 60, 65 40, 88 50 Z" fill="url(#hPrimaryGrad)" opacity="0.95" />
+    <path d="M23 23 C40 38, 30 44, 23 23 Z" fill="url(#hSecondaryGrad)" opacity="0.85" />
+    <path d="M77 77 C60 62, 70 56, 77 77 Z" fill="url(#hSecondaryGrad)" opacity="0.85" />
+    <path d="M77 23 C60 38, 70 44, 77 23 Z" fill="url(#hPrimaryGrad)" opacity="0.85" />
+    <path d="M23 77 C40 62, 30 56, 23 77 Z" fill="url(#hPrimaryGrad)" opacity="0.85" />
+  </g>
+
+  <!-- Tipografía Derecha -->
+  <text x="195" y="92" class="h-brand-title">
+    BLOOMA
+  </text>
+  <text x="197" y="124" class="h-brand-subtitle">
+    SALUD INTEGRAL FEMENINA
+  </text>
+</svg>

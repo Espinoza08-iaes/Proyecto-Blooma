@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="secondaryGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff758f"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <linearGradient id="brandTitleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d9488"/>
+      <stop offset="50%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    .brand-title {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 54px;
+      font-weight: 800;
+      fill: #0f172a;
+      letter-spacing: 6px;
+    }
+    .brand-subtitle {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      fill: #0d9488;
+      letter-spacing: 3px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .brand-title {
+        fill: #ffffff;
+      }
+      .brand-subtitle {
+        fill: #2dd4bf;
+      }
+    }
+  </style>
+
+  <!-- Isotipo Central: Flor y Brote Botánico -->
+  <g transform="translate(125, 30) scale(2.5)">
+    <circle cx="50" cy="50" r="17" fill="url(#primaryGrad)" filter="url(#glow)"/>
+    <path d="M50 12 C60 35, 40 35, 50 12 Z" fill="url(#secondaryGrad)" opacity="0.95" />
+    <path d="M50 88 C60 65, 40 65, 50 88 Z" fill="url(#secondaryGrad)" opacity="0.95" />
+    <path d="M12 50 C35 60, 35 40, 12 50 Z" fill="url(#primaryGrad)" opacity="0.95" />
+    <path d="M88 50 C65 60, 65 40, 88 50 Z" fill="url(#primaryGrad)" opacity="0.95" />
+    <path d="M23 23 C40 38, 30 44, 23 23 Z" fill="url(#secondaryGrad)" opacity="0.85" />
+    <path d="M77 77 C60 62, 70 56, 77 77 Z" fill="url(#secondaryGrad)" opacity="0.85" />
+    <path d="M77 23 C60 38, 70 44, 77 23 Z" fill="url(#primaryGrad)" opacity="0.85" />
+    <path d="M23 77 C40 62, 30 56, 23 77 Z" fill="url(#primaryGrad)" opacity="0.85" />
+  </g>
+
+  <!-- Logotipo Textual -->
+  <text x="250" y="360" class="brand-title" text-anchor="middle">
+    BLOOMA
+  </text>
+  <text x="250" y="400" class="brand-subtitle" text-anchor="middle">
+    SALUD INTEGRAL FEMENINA
+  </text>
+</svg>

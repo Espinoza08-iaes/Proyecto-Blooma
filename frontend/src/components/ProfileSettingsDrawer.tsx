@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Heart, Lock, Cloud, Sparkles, HelpCircle, ChevronRight, Watch, EyeOff, BarChart2, Shield, RefreshCw, Key } from 'lucide-react';
 import { db, type Profile } from '../db/db';
-import { apiGoogleAuth, apiRegister, apiLogin } from '../db/supabase';
+import { apiRegister, apiLogin } from '../db/supabase';
 
 import WearableTelemetryModal from './WearableTelemetryModal';
 
@@ -120,30 +120,13 @@ export default function ProfileSettingsDrawer({
     }
   };
 
-  const handleGoogleAuth = async () => {
-    setIsAuthLoading(true);
-    setAuthStatusMsg('');
-    try {
-      // Simulate / Execute Google OAuth API Call
-      const res = await apiGoogleAuth('google_token_oauth_simulated');
-      setLinkedAccount('Google Account (conectado)');
-      setAuthStatusMsg('✅ Cuenta de Google vinculada con éxito.');
-      setSyncEnabled(true);
-      if (profile) {
-        const updated: Profile = { ...profile, optInSync: true };
-        await db.profile.put(updated, 'main');
-        onProfileUpdate(updated);
-      }
-    } catch (err: any) {
-      setAuthStatusMsg(`❌ ${err.message || 'Error al conectar con Google.'}`);
-    } finally {
-      setIsAuthLoading(false);
-    }
-  };
-
   const handleEmailPassRegister = async () => {
     if (!accountEmail || !accountPassword) {
       setAuthStatusMsg('⚠️ Ingresa un correo y contraseña válidos.');
+      return;
+    }
+    if (accountPassword.length < 6) {
+      setAuthStatusMsg('⚠️ La contraseña debe tener al menos 6 caracteres.');
       return;
     }
     setIsAuthLoading(true);
@@ -151,7 +134,7 @@ export default function ProfileSettingsDrawer({
     try {
       await apiRegister(accountEmail, accountPassword);
       setLinkedAccount(accountEmail);
-      setAuthStatusMsg('✅ Cuenta vinculada y registrada en Supabase.');
+      setAuthStatusMsg('✅ Cuenta vinculada y registrada de forma segura.');
       setSyncEnabled(true);
       if (profile) {
         const updated: Profile = { ...profile, optInSync: true };
@@ -266,26 +249,16 @@ export default function ProfileSettingsDrawer({
           </div>
         </div>
 
-        {/* SECTION 1: GOOGLE OAUTH & EMAIL PASSWORD LINKING */}
+        {/* SECTION 1: EMAIL PASSWORD ACCOUNT BACKUP */}
         <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3">
           <div className="flex items-center space-x-2 text-rose-600">
             <Cloud className="w-5 h-5" />
-            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Vincular Cuenta (Google o Contraseña)</h3>
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Vincular Cuenta (Respaldo en Nube)</h3>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Puedes decidir si deseas vincular una cuenta de Google con tu contraseña para respaldar en Supabase o mantener tus datos 100% locales en tu dispositivo.
+            Vincula un correo y contraseña para respaldar de forma cifrada tus ciclos en Supabase o continúa disfrutando del almacenamiento 100% privado en tu dispositivo.
           </p>
-
-          <button
-            type="button"
-            onClick={handleGoogleAuth}
-            disabled={isAuthLoading}
-            className="w-full py-3 rounded-2xl bg-white border border-slate-300 text-slate-800 font-extrabold text-xs shadow-sm hover:bg-slate-100 flex items-center justify-center space-x-2 cursor-pointer transition-all active:scale-98"
-          >
-            <span className="text-base">🌐</span>
-            <span>Vincular con Cuenta de Google</span>
-          </button>
 
           <div className="pt-2 space-y-2">
             <input
@@ -297,7 +270,7 @@ export default function ProfileSettingsDrawer({
             />
             <input
               type="password"
-              placeholder="Contraseña de acceso"
+              placeholder="Contraseña de acceso (mín. 6 caracteres)"
               value={accountPassword}
               onChange={e => setAccountPassword(e.target.value)}
               className="w-full p-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800"
@@ -306,9 +279,16 @@ export default function ProfileSettingsDrawer({
               type="button"
               onClick={handleEmailPassRegister}
               disabled={isAuthLoading}
-              className="w-full py-2.5 rounded-xl bg-rose-500 text-white font-extrabold text-xs shadow-md hover:bg-rose-600 transition-all cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-rose-500 text-white font-extrabold text-xs shadow-md hover:bg-rose-600 transition-all cursor-pointer flex items-center justify-center space-x-2"
             >
-              Registrar / Vincular por Correo y Contraseña
+              {isAuthLoading ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Procesando cifrado seguro...</span>
+                </>
+              ) : (
+                <span>Registrar / Vincular Cuenta</span>
+              )}
             </button>
           </div>
 

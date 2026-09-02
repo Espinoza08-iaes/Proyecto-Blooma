@@ -2,18 +2,7 @@ import { db } from './db';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Authentication APIs
-export async function apiGoogleAuth(googleToken?: string, email?: string) {
-  const response = await fetch(`${API_URL}/auth/google`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: googleToken, email })
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al autenticar con Google.');
-  return data;
-}
-
+// Authentication APIs (Email & Password)
 export async function apiRegister(email: string, password: string) {
   const response = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',

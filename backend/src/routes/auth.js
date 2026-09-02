@@ -1,23 +1,36 @@
 import express from 'express';
+import crypto from 'crypto';
 import { db } from '../db.js';
 import { hashPassword, verifyPassword, generateToken, authMiddleware } from '../auth.js';
 import { supabase } from '../supabaseClient.js';
 
 const router = express.Router();
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Register new user
 router.post('/register', async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
     return res.status(400).json({ error: 'El correo y la contraseña son requeridos.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!EMAIL_REGEX.test(normalizedEmail)) {
+    return res.status(400).json({ error: 'El formato del correo electrónico es inválido.' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'La contraseña debe contener al menos 6 caracteres.' });
   }
 
   // --- SUPABASE MODE ---
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.admin.createUser({
-        email: email.toLowerCase(),
+        email: normalizedEmail,
         password,
         email_confirm: true
       });
@@ -48,18 +61,18 @@ router.post('/register', async (req, res) => {
   // --- LOCAL FALLBACK MODE ---
   try {
     const users = await db.getUsers();
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
     if (existingUser) {
       return res.status(400).json({ error: 'El correo ya está registrado.' });
     }
 
-    const { hash, salt } = hashPassword(password);
+    const { hash, salt } = await hashPassword(password);
     const userId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
 
     const newUser = {
       id: userId,
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       hash,
       salt,
       createdAt: new Date().toISOString()
@@ -101,15 +114,17 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || typeof email !== 'string' || !password || typeof password !== 'string') {
     return res.status(400).json({ error: 'El correo y la contraseña son requeridos.' });
   }
+
+  const normalizedEmail = email.trim().toLowerCase();
 
   // --- SUPABASE MODE ---
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.toLowerCase(),
+        email: normalizedEmail,
         password
       });
 
@@ -120,7 +135,7 @@ router.post('/login', async (req, res) => {
       const userId = data.user.id;
       
       // Fetch profile from perfiles table
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('perfiles')
         .select('*')
         .eq('id', userId)
@@ -156,9 +171,12 @@ router.post('/login', async (req, res) => {
   // --- LOCAL FALLBACK MODE ---
   try {
     const users = await db.getUsers();
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
-    if (!user || !verifyPassword(password, user.hash, user.salt)) {
+    // Siempre derivar para evitar oráculo de tiempo (timing oracle)
+    const isPasswordValid = await verifyPassword(password, user?.hash, user?.salt);
+
+    if (!user || !isPasswordValid) {
       return res.status(401).json({ error: 'Credenciales inválidas.' });
     }
 
@@ -188,86 +206,6 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Error interno en el inicio de sesión.' });
-  }
-});
-
-// Google OAuth Handler
-router.post('/google', async (req, res) => {
-  const { token, email, name } = req.body;
-
-  if (!email && !token) {
-    return res.status(400).json({ error: 'Token o correo de Google requerido.' });
-  }
-
-  const userEmail = (email || 'usuario.google@blooma.app').toLowerCase();
-
-  // --- SUPABASE MODE ---
-  if (supabase) {
-    try {
-      let userId;
-      const { data: existingUser } = await supabase.from('perfiles').select('id').eq('email', userEmail).maybeSingle();
-      
-      if (existingUser) {
-        userId = existingUser.id;
-      } else {
-        const { data: newUser, error } = await supabase.auth.admin.createUser({
-          email: userEmail,
-          email_confirm: true,
-          user_metadata: { provider: 'google', name }
-        });
-        if (error) throw error;
-        userId = newUser.user.id;
-      }
-
-      const authToken = generateToken({ userId });
-      res.json({
-        message: 'Sesión iniciada con Google en la nube.',
-        token: authToken,
-        profile: { stage: 'cycle', optInSync: true, pinEnabled: false }
-      });
-      return;
-    } catch (error) {
-      console.error('Google OAuth Supabase error:', error);
-      return res.status(500).json({ error: 'Error al autenticar con Google en Supabase.' });
-    }
-  }
-
-  // --- LOCAL FALLBACK MODE ---
-  try {
-    const users = await db.getUsers();
-    let user = users.find(u => u.email.toLowerCase() === userEmail);
-
-    if (!user) {
-      const userId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
-      user = {
-        id: userId,
-        email: userEmail,
-        provider: 'google',
-        createdAt: new Date().toISOString()
-      };
-      users.push(user);
-
-      const profiles = await db.getProfiles();
-      profiles.push({
-        userId,
-        stage: 'cycle',
-        optInSync: true,
-        pinEnabled: false,
-        pinCode: '',
-        updatedAt: new Date().toISOString()
-      });
-      await db.commit();
-    }
-
-    const authToken = generateToken({ userId: user.id });
-    res.json({
-      message: 'Sesión iniciada con Google.',
-      token: authToken,
-      profile: { stage: 'cycle', optInSync: true, pinEnabled: false }
-    });
-  } catch (error) {
-    console.error('Local Google auth error:', error);
-    res.status(500).json({ error: 'Error interno en autenticación de Google.' });
   }
 });
 
