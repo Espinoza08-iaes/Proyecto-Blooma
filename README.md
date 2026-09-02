@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="entregables_hackathon/02_diseno_grafico/logos/blooma_logo_principal.svg" width="420" alt="Logo Oficial Blooma" />
+  <img src="entregables_hackathon/02_diseno_grafico/logos/blooma_logo_principal.svg" width="250" alt="Logo Oficial Blooma (Composición Vertical)" />
 </p>
 
 <p align="center">

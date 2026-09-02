@@ -62,11 +62,13 @@ export default function MenopauseDashboard({ profile, onOpenDrawer, onOpenCalend
           onClick={() => { if (onOpenDrawer) onOpenDrawer(); }}
           className="relative group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-all overflow-hidden border-2 border-white">
+          <div className="w-10 h-10 rounded-full bg-white text-slate-700 flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-all overflow-hidden border-2 border-slate-200 p-1">
             {profile?.customAvatarUrl ? (
-              <img src={profile.customAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              <img src={profile.customAvatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+            ) : profile?.appIcon === 'blooma' || !profile?.appIcon || profile?.appIcon === '🦙' ? (
+              <img src="/blooma_isotipo.png" alt="Isotipo Oficial Blooma" className="w-full h-full object-contain" />
             ) : (
-              <span>{profile?.appIcon || '🦙'}</span>
+              <span>{profile?.appIcon}</span>
             )}
           </div>
           <div className="absolute top-0 right-0 w-3 h-3 bg-rose-500 rounded-full border-2 border-white" />

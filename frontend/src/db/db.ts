@@ -15,6 +15,7 @@ export interface Profile {
   themeColor?: 'earth' | 'orchid' | 'forest' | 'ocean';
   themeTextSize?: 'normal' | 'large';
   appIcon?: string;
+  logoVariant?: 'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun';
   conceptionMode?: boolean;
   customAvatarUrl?: string;
 }

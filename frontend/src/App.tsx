@@ -265,11 +265,13 @@ export default function App() {
           <aside className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col gap-5 sticky top-6 pt-4">
             <div className="bg-white/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 shadow-md space-y-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-rose-400 to-indigo-500 text-white flex items-center justify-center font-extrabold text-sm shadow-sm overflow-hidden border-2 border-white">
+                <div className="h-10 w-10 rounded-full bg-white text-slate-700 flex items-center justify-center font-extrabold text-sm shadow-sm overflow-hidden border-2 border-slate-200 p-1">
                   {profile.customAvatarUrl ? (
-                    <img src={profile.customAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={profile.customAvatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+                  ) : profile.appIcon === 'blooma' || !profile.appIcon || profile.appIcon === '🦙' ? (
+                    <img src="/blooma_isotipo.png" alt="Isotipo Oficial Blooma" className="w-full h-full object-contain" />
                   ) : (
-                    <span>{profile.appIcon || '🦙'}</span>
+                    <span>{profile.appIcon}</span>
                   )}
                 </div>
                 <div>

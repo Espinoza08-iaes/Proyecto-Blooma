@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, User, Heart, Lock, Cloud, Sparkles, HelpCircle, ChevronRight, Watch, EyeOff, BarChart2, Shield, RefreshCw, Key } from 'lucide-react';
 import { db, type Profile } from '../db/db';
 import { apiRegister, apiLogin } from '../db/supabase';
+import BloomaLogo from './BloomaLogo';
 
 import WearableTelemetryModal from './WearableTelemetryModal';
 
@@ -26,8 +27,9 @@ export default function ProfileSettingsDrawer({
   const [pinEnabled, setPinEnabled] = useState(false);
   const [pinCode, setPinCode] = useState('1234');
   const [discreteMode, setDiscreteMode] = useState(false);
-  const PRESET_AVATARS = ['🦙', '🌸', '🦊', '👑', '🦋', '🌿', '👶', '🌙', '💃', '🍉', '🧘‍♀️', '🦄', '🌷', '🌺', '🎨', '✨'];
-  const [selectedEmoji, setSelectedEmoji] = useState('🦙');
+  const [selectedLogo, setSelectedLogo] = useState<'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun'>('lotus');
+  const PRESET_AVATARS = ['🌸', '🦊', '👑', '🦋', '🌿', '👶', '🌙', '💃', '🍉', '🧘‍♀️', '🦄', '🌷', '🌺', '🎨', '✨'];
+  const [selectedEmoji, setSelectedEmoji] = useState('blooma');
   const [customAvatar, setCustomAvatar] = useState<string | null>(null);
 
   const handleSelectPresetAvatar = async (emoji: string) => {
@@ -62,10 +64,23 @@ export default function ProfileSettingsDrawer({
       setPinEnabled(profile.isPinEnabled || false);
       setPinCode(profile.pinCode || '1234');
       setDiscreteMode(profile.isDiscreteMode || false);
-      setSelectedEmoji(profile.appIcon || '🦙');
+      setSelectedEmoji(profile.appIcon || 'blooma');
+      setSelectedLogo(profile.logoVariant || 'lotus');
       setCustomAvatar(profile.customAvatarUrl || null);
     }
   }, [profile]);
+
+  const handleLogoChange = async (variant: 'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun') => {
+    setSelectedLogo(variant);
+    if (profile) {
+      const updated: Profile = {
+        ...profile,
+        logoVariant: variant
+      };
+      await db.profile.put(updated, 'main');
+      onProfileUpdate(updated);
+    }
+  };
 
   const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -190,11 +205,13 @@ export default function ProfileSettingsDrawer({
         {/* Profile Card Header with Custom Avatar Upload */}
         <div className="flex items-center space-x-4 p-4 rounded-3xl bg-gradient-to-r from-rose-50 via-pink-50 to-purple-50 border border-rose-100 relative">
           <label className="relative group cursor-pointer">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-purple-500 text-white flex items-center justify-center text-2xl shadow-md overflow-hidden border-2 border-white">
+            <div className="w-16 h-16 rounded-full bg-white shadow-md overflow-hidden border-2 border-slate-200 p-2 flex items-center justify-center">
               {customAvatar ? (
-                <img src={customAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={customAvatar} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+              ) : selectedEmoji === 'blooma' || selectedEmoji === '🦙' ? (
+                <img src="/blooma_isotipo.png" alt="Isotipo Oficial Blooma" className="w-full h-full object-contain" />
               ) : (
-                <span>{selectedEmoji}</span>
+                <span className="text-2xl">{selectedEmoji}</span>
               )}
             </div>
             <div className="absolute inset-0 bg-slate-900/40 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
@@ -232,6 +249,20 @@ export default function ProfileSettingsDrawer({
           </span>
 
           <div className="flex items-center space-x-2 overflow-x-auto py-1 scrollbar-none">
+            {/* 1. Isotipo Oficial Blooma (Floral B) */}
+            <button
+              type="button"
+              onClick={() => handleSelectPresetAvatar('blooma')}
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0 p-1.5 ${
+                !customAvatar && (selectedEmoji === 'blooma' || selectedEmoji === '🦙')
+                  ? 'bg-teal-50 border-2 border-teal-500 shadow-md ring-4 ring-teal-200 scale-110'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:scale-105'
+              }`}
+              title="Isotipo Oficial Blooma (Floral B)"
+            >
+              <img src="/blooma_isotipo.png" alt="Isotipo Oficial Blooma" className="w-7 h-7 object-contain" />
+            </button>
+
             {PRESET_AVATARS.map(emoji => (
               <button
                 key={emoji}
@@ -413,6 +444,43 @@ export default function ProfileSettingsDrawer({
                 </span>
               </div>
             </button>
+          </div>
+        </div>
+
+        {/* SECTION: BRAND LOGO & APP ICON SELECTOR */}
+        <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3">
+          <div className="flex items-center space-x-2 text-teal-700">
+            <Sparkles className="w-5 h-5" />
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Identificador y Logo de la Aplicación</h3>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Personaliza el isotipo de Blooma mostrado en la aplicación:
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+            {[
+              { id: 'lotus', name: 'Flor de Loto (Oficial)', desc: 'Identidad oficial' },
+              { id: 'sprout', name: 'Brote Vital', desc: 'Renacimiento' },
+              { id: 'flower', name: 'Flor Sakura', desc: 'Ciclo natural' },
+              { id: 'butterfly', name: 'Mariposa', desc: 'Transformación' },
+              { id: 'sun', name: 'Sol Matutino', desc: 'Energía y luz' },
+            ].map(item => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleLogoChange(item.id as any)}
+                className={`p-3 rounded-2xl border text-left flex flex-col items-center justify-center transition-all cursor-pointer ${
+                  selectedLogo === item.id
+                    ? 'bg-teal-50 border-teal-500 ring-2 ring-teal-200 shadow-sm'
+                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <BloomaLogo variant={item.id as any} className="w-8 h-8 mb-1.5" />
+                <span className="text-[11px] font-bold text-slate-900 text-center">{item.name}</span>
+                <span className="text-[9px] text-slate-400 text-center">{item.desc}</span>
+              </button>
+            ))}
           </div>
         </div>
 
