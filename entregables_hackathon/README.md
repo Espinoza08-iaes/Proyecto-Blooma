@@ -60,19 +60,19 @@ entregables_hackathon/
 │   └── 06_PLAN_FINANCIERO_PRESUPUESTO.md --> Modelo de costos, sostenibilidad y presupuesto
 │
 └── pdf/ --> Dossier Oficial Clasificado por las 3 Disciplinas de la Plataforma
-    ├── 01_diseno/
-    │   ├── 02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf --> Manual de Marca Oficial (12 MB)
-    │   └── PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf --> Ficha de Colores y WCAG AA
-    ├── 02_marketing/
-    │   ├── 03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf --> Plan Integral de Negocio y Producto
-    │   ├── PLANTILLA_BUSINESS_MODEL_CANVAS.pdf --> Lean Canvas de 9 Bloques
-    │   ├── PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf --> Perfiles y Mapas de Empatía
-    │   ├── PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf --> 4 Metas SMART y Cronograma
-    │   └── PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf --> Modelo Financiero y Presupuesto
-    └── 03_desarrollo/
-        ├── 01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf --> Arquitectura y Endpoints REST
-        ├── DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf --> Documento Maestro Integral
-        └── DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf --> Formulario Ético de IA
+    ├── 01_desarrollo/
+    │   ├── 01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf --> Arquitectura y Endpoints REST
+    │   ├── DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf --> Documento Maestro Integral
+    │   └── DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf --> Formulario Ético de IA
+    ├── 02_diseno_grafico/
+    │   ├── 02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf --> Manual de Marca Oficial en Alta Definición (12 MB)
+    │   └── PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf --> Ficha de Colores y Accesibilidad WCAG AA
+    └── 03_marketing_y_negocios/
+        ├── 03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf --> Plan Integral de Negocio y Producto
+        ├── PLANTILLA_BUSINESS_MODEL_CANVAS.pdf --> Lean Canvas de 9 Bloques
+        ├── PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf --> Perfiles y Mapas de Empatía
+        ├── PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf --> 4 Metas SMART y Cronograma
+        └── PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf --> Modelo Financiero y Presupuesto
 ```
 
 ---

@@ -158,20 +158,20 @@ La carpeta [entregables_hackathon/](entregables_hackathon/) contiene la document
   * `04_PROPUESTA_VALOR_Y_CANALES.md` — Value Proposition Canvas y canales digitales/comunitarios.
   * `05_OBJETIVOS_SMART_CRONOGRAMA.md` — 4 Metas SMART cuantificables y diagrama de Gantt.
   * `06_PLAN_FINANCIERO_PRESUPUESTO.md` — Estructura de costos, presupuesto y sostenibilidad B2G.
-* **pdf/ (Dossier Oficial Clasificado por Disciplinas)**
-  * **01_diseno/**
-    * `02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf` — Manual de Marca oficial en alta definición.
+* **pdf/ (Dossier Oficial Clasificado por las 3 Disciplinas)**
+  * **01_desarrollo/**
+    * `01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf` — Arquitectura de software, diagramas y endpoints.
+    * `DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf` — Documento Maestro Integral de todas las disciplinas.
+    * `DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf` — Formulario oficial de ética y transparencia IA.
+  * **02_diseno_grafico/**
+    * `02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf` — Manual de Marca oficial en alta definición (12 MB).
     * `PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf` — Ficha de paletas y matrices de contraste WCAG AA.
-  * **02_marketing/**
+  * **03_marketing_y_negocios/**
     * `03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf` — Plan integral de producto y comercialización B2G.
     * `PLANTILLA_BUSINESS_MODEL_CANVAS.pdf` — Matriz Lean Canvas de 9 bloques.
     * `PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf` — Perfiles de usuarias y mapas de empatía.
     * `PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf` — 4 Metas SMART y diagrama de tiempos.
     * `PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf` — Estructura de costos y presupuesto.
-  * **03_desarrollo/**
-    * `01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf` — Arquitectura de software, diagramas y endpoints.
-    * `DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf` — Documento Maestro Integral de todas las disciplinas.
-    * `DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf` — Formulario oficial de ética y transparencia IA.
 
 ---
 
