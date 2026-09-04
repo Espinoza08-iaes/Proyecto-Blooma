@@ -1,19 +1,28 @@
 import React from 'react';
 import { Droplet, Plus, Watch, Heart } from 'lucide-react';
+import { useTranslation } from '../i18n/useTranslation';
+import type { Profile } from '../db/db';
+import type { SupportedLanguage } from '../i18n/translations';
 
 interface FloatingActionDockProps {
   onLogPeriod: () => void;
   onLogSymptoms: () => void;
   onWearableSync: () => void;
   stage?: 'cycle' | 'pregnancy' | 'menopause';
+  profile?: Profile | null;
+  language?: SupportedLanguage;
 }
 
 export default function FloatingActionDock({
   onLogPeriod,
   onLogSymptoms,
   onWearableSync,
-  stage = 'cycle'
+  stage = 'cycle',
+  profile,
+  language
 }: FloatingActionDockProps) {
+  const { t } = useTranslation(language || profile);
+
   return (
     <div className="flex justify-center items-center space-x-6 my-6">
       {/* Button 1: Period / Stage log */}
@@ -26,7 +35,11 @@ export default function FloatingActionDock({
           <Droplet className="w-6 h-6 fill-white" />
         </div>
         <span className="text-xs font-semibold text-slate-700 mt-2">
-          {stage === 'pregnancy' ? 'Pataditas' : stage === 'menopause' ? 'Sofocos' : 'Registrar periodo'}
+          {stage === 'pregnancy'
+            ? t.dashboards.babyKicksBtn
+            : stage === 'menopause'
+            ? t.dashboards.hotFlashesBtn
+            : t.dashboards.logPeriodAction}
         </span>
       </button>
 
@@ -39,7 +52,9 @@ export default function FloatingActionDock({
         <div className="w-14 h-14 rounded-full bg-white text-slate-800 border border-slate-200 flex items-center justify-center shadow-lg shadow-slate-100 group-hover:scale-105 group-active:scale-95 transition-all duration-200">
           <Plus className="w-7 h-7 text-slate-800" />
         </div>
-        <span className="text-xs font-semibold text-slate-700 mt-2">Síntomas</span>
+        <span className="text-xs font-semibold text-slate-700 mt-2">
+          {t.dashboards.logSymptomsBtn}
+        </span>
       </button>
 
       {/* Button 3: Wearable Sync / Telemetry */}
@@ -51,7 +66,9 @@ export default function FloatingActionDock({
         <div className="w-14 h-14 rounded-full bg-white text-teal-600 border border-teal-100 flex items-center justify-center shadow-lg shadow-teal-50 group-hover:scale-105 group-active:scale-95 transition-all duration-200">
           <Watch className="w-6 h-6 text-teal-600" />
         </div>
-        <span className="text-xs font-semibold text-slate-700 mt-2">Reloj / Anillo</span>
+        <span className="text-xs font-semibold text-slate-700 mt-2">
+          {t.dashboards.wearableBtn}
+        </span>
       </button>
     </div>
   );

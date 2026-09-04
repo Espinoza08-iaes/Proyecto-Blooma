@@ -14,6 +14,8 @@ import DoctorReportModal from '../components/DoctorReportModal';
 import ProfileSettingsDrawer from '../components/ProfileSettingsDrawer';
 import FullCalendarModal from '../components/FullCalendarModal';
 import HormoneSimulatorCard from '../components/HormoneSimulatorCard';
+import WearableTelemetryModal from '../components/WearableTelemetryModal';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface CycleDashboardProps {
   profile: Profile | null;
@@ -22,10 +24,24 @@ interface CycleDashboardProps {
 }
 
 export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }: CycleDashboardProps) {
+  const { t } = useTranslation(profile);
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isLoggingSheetOpen, setIsLoggingSheetOpen] = useState(false);
+  const [isWearableModalOpen, setIsWearableModalOpen] = useState(false);
+
+  // Lock body scroll when modal is active
+  useEffect(() => {
+    const isAnyModalOpen = isReportOpen || isLoggingSheetOpen || isWearableModalOpen;
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isReportOpen, isLoggingSheetOpen, isWearableModalOpen]);
 
   const [selectedLogDate, setSelectedLogDate] = useState(new Date().toISOString().split('T')[0]);
   const [activeLog, setActiveLog] = useState<DailyLog | undefined>(undefined);
@@ -220,6 +236,7 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
       {/* Hero Dial Adaptativo con Palette Shift */}
       <HeroDial
         stage="cycle"
+        profile={profile}
         cycleDay={cycleDay}
         cycleLength={stats.avgLength}
         isDelayed={isDelayed}
@@ -234,9 +251,10 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
       {/* Floating 3-Button Action Dock */}
       <FloatingActionDock
         stage="cycle"
+        profile={profile}
         onLogPeriod={() => setIsLoggingSheetOpen(true)}
         onLogSymptoms={() => setIsLoggingSheetOpen(true)}
-        onWearableSync={() => {}}
+        onWearableSync={() => setIsWearableModalOpen(true)}
       />
 
       {/* Smartwatch / Smart Ring Live Telemetry Sync */}
@@ -245,24 +263,24 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
       {/* Double Column Metric Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
         <MetricSummaryCard
-          title="Duración del Ciclo"
+          title={t.dashboards.cycleLengthCardTitle}
           value={stats.avgLength}
-          unit="días"
-          statusBadge="NORMAL"
+          unit={t.dashboards.daysUnit}
+          statusBadge={t.dashboards.normalBadge}
           infoTooltip="Calculado mediante la mediana de tus ciclos reales."
         />
         <MetricSummaryCard
-          title="Duración del Sangrado"
+          title={t.dashboards.periodLengthCardTitle}
           value={stats.avgPeriodLength}
-          unit="días"
-          statusBadge="REGULAR"
+          unit={t.dashboards.daysUnit}
+          statusBadge={t.dashboards.regularBadge}
           infoTooltip="Duración habitual de la menstruación."
         />
       </div>
 
       {/* Medical Guidelines Card */}
       <MedicalGuidelineCard
-        title="Según guías clínicas del MINSA y OMS"
+        title={t.dashboards.medGuidelineTitle}
         statusText={isDelayed ? 'Retraso Fisiológico Bajo Observación' : 'Ciclo Regular'}
         explanation={
           isDelayed
@@ -279,8 +297,8 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-slate-900">Reporte Médico Resumido</h4>
-            <p className="text-xs text-slate-500">Genera un PDF con tus datos para tu ginecóloga.</p>
+            <h4 className="text-sm font-bold text-slate-900">{t.dashboards.doctorReportCardTitle}</h4>
+            <p className="text-xs text-slate-500">{t.dashboards.doctorReportCardSub}</p>
           </div>
         </div>
 
@@ -288,7 +306,7 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
           onClick={() => setIsReportOpen(true)}
           className="px-4 py-2 rounded-full bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-200 hover:bg-rose-600 transition-all active:scale-95 cursor-pointer"
         >
-          Exportar
+          {t.dashboards.exportButton}
         </button>
       </div>
 
@@ -325,6 +343,13 @@ export default function CycleDashboard({ profile, onOpenDrawer, onOpenCalendar }
           dailyLogs={dailyLogs}
         />
       )}
+
+      {/* Smartwatch / Smart Ring Telemetry Modal */}
+      <WearableTelemetryModal
+        isOpen={isWearableModalOpen}
+        onClose={() => setIsWearableModalOpen(false)}
+        stage="cycle"
+      />
     </div>
   );
 }

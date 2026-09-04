@@ -12,9 +12,11 @@ import FullCalendarModal from './components/FullCalendarModal';
 import { Sparkles, Calendar, ClipboardList, Database } from 'lucide-react';
 
 import { syncLocalDataWithServer } from './db/supabase';
+import { useTranslation } from './i18n/useTranslation';
 
 export default function App() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const { t } = useTranslation(profile);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -145,7 +147,7 @@ export default function App() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <span className="text-xs font-bold text-slate-500">Cargando Blooma...</span>
+          <span className="text-xs font-bold text-slate-500">{t.nav.loading}</span>
         </div>
       </div>
     );
@@ -163,8 +165,8 @@ export default function App() {
             <div className="w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-3">
               🌸
             </div>
-            <h2 className="text-lg font-black text-slate-900">Blooma Protegida</h2>
-            <p className="text-xs text-slate-500 mt-1">Ingresa tu código PIN de 4 dígitos</p>
+            <h2 className="text-lg font-black text-slate-900">{t.settings.securityTitle}</h2>
+            <p className="text-xs text-slate-500 mt-1">{t.settings.pinCodeLabel}</p>
           </div>
 
           <div className="flex justify-center space-x-3">
@@ -275,35 +277,35 @@ export default function App() {
                   )}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 leading-tight text-sm">Usuario de Blooma</h3>
+                  <h3 className="font-extrabold text-slate-900 leading-tight text-sm">{t.settings.userTitle}</h3>
                   <span className="text-[10px] text-rose-600 font-extrabold uppercase tracking-wider">
                     {profile.stage === 'cycle'
-                      ? profile.conceptionMode ? 'Planificar Embarazo' : 'Ciclo Menstrual'
+                      ? profile.conceptionMode ? t.settings.conceptionStageName : t.settings.cycleStageName
                       : profile.stage === 'pregnancy'
-                      ? 'Embarazo Activo'
-                      : 'Menopausia'}
+                      ? t.settings.pregnancyStageName
+                      : t.settings.menopauseStageName}
                   </span>
                 </div>
               </div>
 
               <div className="space-y-2 border-t border-slate-100 pt-3 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500 font-medium">Edad:</span>
-                  <span className="font-bold text-slate-900">{profile.age ? `${profile.age} años` : 'No especificada'}</span>
+                  <span className="text-slate-500 font-medium">{t.dashboards.ageLabel}</span>
+                  <span className="font-bold text-slate-900">{profile.age ? `${profile.age} ${t.dashboards.yearsUnit}` : t.dashboards.notSpecified}</span>
                 </div>
               </div>
             </div>
 
             <div className="bg-white/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 shadow-md space-y-2.5">
-              <h4 className="font-extrabold text-slate-900 text-[10px] uppercase tracking-wider">Resumen de Etapa</h4>
+              <h4 className="font-extrabold text-slate-900 text-[10px] uppercase tracking-wider">{t.dashboards.stageSummaryTitle}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
                 {profile.stage === 'cycle' 
                   ? profile.conceptionMode
-                    ? 'Monitoreo de ovulación y ventana fértil optimizada para concepción.'
-                    : 'Registra tus síntomas diariamente para predecir tu periodo y ventana fértil.'
+                    ? t.settings.conceptionStageDesc
+                    : t.settings.cycleStageDesc
                   : profile.stage === 'pregnancy'
-                  ? 'Monitorea tus síntomas con el triaje automatizado del MINSA.'
-                  : 'Registra tus calores súbitos y descanso nocturno.'}
+                  ? t.settings.pregnancyStageDesc
+                  : t.settings.menopauseStageDesc}
               </p>
             </div>
           </aside>
@@ -346,13 +348,13 @@ export default function App() {
             
             {activeTab === 'log' && (
               <div className="animate-page-enter pt-4">
-                <LogSymptoms stage={profile.stage} onSave={() => setActiveTab('dashboard')} />
+                <LogSymptoms stage={profile.stage} profile={profile} onSave={() => setActiveTab('dashboard')} />
               </div>
             )}
             
             {activeTab === 'history' && (
               <div className="animate-page-enter pt-4">
-                <History stage={profile.stage} />
+                <History stage={profile.stage} profile={profile} />
               </div>
             )}
           </section>
@@ -362,18 +364,18 @@ export default function App() {
             <div className="bg-white/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 shadow-md space-y-3">
               <div className="flex items-center gap-2 text-teal-600">
                 <Sparkles className="h-4.5 w-4.5" />
-                <h4 className="font-extrabold text-slate-900 text-[10px] uppercase tracking-wider">Consejo del Día</h4>
+                <h4 className="font-extrabold text-slate-900 text-[10px] uppercase tracking-wider">{t.dashboards.dailyTipTitle}</h4>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Beber suficiente agua y caminar 30 minutos al día ayuda a regular el balance hormonal.
+                {t.dashboards.dailyTipDesc}
               </p>
             </div>
 
             <div className="bg-rose-50/80 backdrop-blur-md rounded-3xl p-5 border border-rose-100 shadow-md space-y-3">
-              <h4 className="font-extrabold text-rose-800 text-[10px] uppercase tracking-wider">Línea de Asistencia MINSA</h4>
+              <h4 className="font-extrabold text-rose-800 text-[10px] uppercase tracking-wider">{t.dashboards.minsaLineTitle}</h4>
               <div className="flex flex-col gap-1.5 pt-1">
                 <a href="tel:102" className="flex items-center justify-between text-xs font-bold text-rose-700 bg-white border border-rose-200 py-2 px-3 rounded-xl shadow-sm">
-                  <span>Línea Materna MINSA</span>
+                  <span>{t.dashboards.minsaMaternalLine}</span>
                   <span>102</span>
                 </a>
               </div>
@@ -387,9 +389,9 @@ export default function App() {
       <nav className="fixed bottom-4 left-4 right-4 md:max-w-md md:mx-auto rounded-2xl bg-white/90 backdrop-blur-md shadow-2xl border border-slate-200/80 z-40">
         {(() => {
           const tabs = [
-            { id: 'dashboard' as const, label: 'Hoy', icon: Calendar },
-            { id: 'log' as const, label: 'Registrar', icon: ClipboardList },
-            { id: 'history' as const, label: 'Bitácora', icon: Database },
+            { id: 'dashboard' as const, label: t.dashboards.navHoy, icon: Calendar },
+            { id: 'log' as const, label: t.dashboards.navRegistrar, icon: ClipboardList },
+            { id: 'history' as const, label: t.dashboards.navBitacora, icon: Database },
           ];
           const activeIndex = tabs.findIndex(t => t.id === activeTab);
           

@@ -5,7 +5,7 @@ interface MetricSummaryCardProps {
   title: string;
   value: string | number;
   unit?: string;
-  statusBadge?: 'NORMAL' | 'VIGILAR' | 'REGULAR' | 'VARIABLE';
+  statusBadge?: 'NORMAL' | 'VIGILAR' | 'REGULAR' | 'VARIABLE' | string;
   infoTooltip?: string;
 }
 
@@ -17,16 +17,14 @@ export default function MetricSummaryCard({
   infoTooltip
 }: MetricSummaryCardProps) {
   const getBadgeStyle = () => {
-    switch (statusBadge) {
-      case 'NORMAL':
-      case 'REGULAR':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'VIGILAR':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'VARIABLE':
-      default:
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    const badgeUpper = (statusBadge || '').toUpperCase();
+    if (badgeUpper.includes('NORMAL') || badgeUpper.includes('REGULAR') || badgeUpper.includes('PASTA') || badgeUpper.includes('GOOD')) {
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     }
+    if (badgeUpper.includes('VIGILAR') || badgeUpper.includes('OBSERVE') || badgeUpper.includes('WARN')) {
+      return 'bg-amber-50 text-amber-700 border-amber-200';
+    }
+    return 'bg-indigo-50 text-indigo-700 border-indigo-200';
   };
 
   return (

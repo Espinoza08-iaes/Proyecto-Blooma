@@ -59,17 +59,20 @@ entregables_hackathon/
 │   ├── 05_OBJETIVOS_SMART_CRONOGRAMA.md --> Objetivos SMART y cronograma de entrega
 │   └── 06_PLAN_FINANCIERO_PRESUPUESTO.md --> Modelo de costos, sostenibilidad y presupuesto
 │
-└── pdf/ --> 10 Documentos y Plantillas Ejecutivas en PDF Listas para Evaluación
-    ├── DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf
-    ├── DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf
-    ├── 01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf
-    ├── 02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf
-    ├── 03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf
-    ├── PLANTILLA_BUSINESS_MODEL_CANVAS.pdf
-    ├── PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf
-    ├── PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf
-    ├── PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf
-    └── PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf
+└── pdf/ --> Dossier Oficial Clasificado por las 3 Disciplinas de la Plataforma
+    ├── 01_diseno/
+    │   ├── 02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf --> Manual de Marca Oficial (12 MB)
+    │   └── PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf --> Ficha de Colores y WCAG AA
+    ├── 02_marketing/
+    │   ├── 03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf --> Plan Integral de Negocio y Producto
+    │   ├── PLANTILLA_BUSINESS_MODEL_CANVAS.pdf --> Lean Canvas de 9 Bloques
+    │   ├── PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf --> Perfiles y Mapas de Empatía
+    │   ├── PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf --> 4 Metas SMART y Cronograma
+    │   └── PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf --> Modelo Financiero y Presupuesto
+    └── 03_desarrollo/
+        ├── 01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf --> Arquitectura y Endpoints REST
+        ├── DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf --> Documento Maestro Integral
+        └── DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf --> Formulario Ético de IA
 ```
 
 ---
@@ -87,7 +90,7 @@ entregables_hackathon/
 ---
 
 ## Enlaces Rápidos del Proyecto
-* **Aplicación Web en Producción (Vercel):** [https://proyecto-blooma.vercel.app/](https://proyecto-blooma.vercel.app/)
-* **Repositorio en GitHub:** [https://github.com/Espinoza08-iaes/Proyecto-Blooma](https://github.com/Espinoza08-iaes/Proyecto-Blooma)
-* **Tablero Kanban en GitHub Projects:** [https://github.com/users/Espinoza08-iaes/projects/2](https://github.com/users/Espinoza08-iaes/projects/2)
-* **Video Pitch de 1 Minuto:** [Ver en YouTube Shorts](https://youtube.com/shorts/qLHfupRCO-Q?si=O0pgQD1246XFiipS)
+* **Aplicación Web en Producción (Vercel):** <a href="https://proyecto-blooma.vercel.app/" target="_blank" rel="noopener noreferrer">https://proyecto-blooma.vercel.app/</a>
+* **Repositorio en GitHub:** <a href="https://github.com/Espinoza08-iaes/Proyecto-Blooma" target="_blank" rel="noopener noreferrer">https://github.com/Espinoza08-iaes/Proyecto-Blooma</a>
+* **Tablero Kanban en GitHub Projects:** <a href="https://github.com/users/Espinoza08-iaes/projects/2" target="_blank" rel="noopener noreferrer">https://github.com/users/Espinoza08-iaes/projects/2</a>
+* **Video Pitch de 1 Minuto:** <a href="https://youtube.com/shorts/qLHfupRCO-Q?si=O0pgQD1246XFiipS" target="_blank" rel="noopener noreferrer">Ver en YouTube Shorts</a>

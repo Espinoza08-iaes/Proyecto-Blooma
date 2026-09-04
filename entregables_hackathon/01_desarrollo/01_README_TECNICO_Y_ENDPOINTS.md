@@ -156,27 +156,58 @@ Sincroniza en lote ciclos menstruales, registros diarios y triajes usando resolu
 
 ---
 
-### 3.3 Módulo de Directorio de Casas Maternas (`/api/casas-maternas`)
+### 3.3 Módulo de Red de Salud y Casas Maternas (`/api/casas-maternas`)
 
 #### `GET /api/casas-maternas?department=Matagalpa`
-Consulta el directorio geolocalizado de Casas Maternas de la red nacional del MINSA.
+Consulta el directorio georreferenciado de Casas Maternas y Hospitales con resolución quirúrgica del MINSA.
 * **Response `200 OK`:**
- ```json
- [
- {
- "id": 1,
- "name": "Casa Materna Gladys Marín",
- "department": "Matagalpa",
- "municipality": "Matagalpa",
- "phone": "+505 2772 2012",
- "address": "De la Catedral 2 cuadras al norte, 1 cuadra al este."
- }
- ]
- ```
+  ```json
+  [
+    {
+      "id": 4,
+      "name": "Hospital Regional César Amador Molina",
+      "department": "Matagalpa",
+      "municipality": "Matagalpa",
+      "silais": "SILAIS Matagalpa",
+      "type": "hospital",
+      "phone": "+505 2772 3215",
+      "address": "Salida a Managua, frente al Complejo Judicial.",
+      "latitude": 12.915200,
+      "longitude": -85.929800,
+      "has_emergency_24h": true,
+      "has_obstetric_surgery": true,
+      "has_ambulance": true
+    }
+  ]
+  ```
+
+#### Algoritmo de Proximidad Haversine (Cliente Local-First)
+El cálculo de distancia se realiza 100% en el dispositivo del usuario sin consumir datos móviles:
+$$\text{distancia} = 2 R \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta \text{lat}}{2}\right) + \cos(\text{lat}_1)\cos(\text{lat}_2)\sin^2\left(\frac{\Delta \text{lon}}{2}\right)}\right)$$
+Donde $R = 6371\text{ km}$. El cliente ordena en tiempo real los 25 establecimientos georreferenciados.
 
 ---
 
-### 3.4 Módulo de Analítica y Detección de Anomalías (`/api/insights`)
+### 3.4 Módulo de Inclusión Lingüística Multiétnica y Diversidad Territorial
+* **Español Nacional / Comunitario**: Interfaz adaptada al contexto cultural nicaragüense.
+* **Miskitu (*Miskitu Yapu*)**: RACCN, Waspam, Río Coco, Bilwi. Alertas vitales y protocolos de Casas Maternas (*Upla Nani Baiki Sakanka*).
+* **Nicaraguan Creole English**: RACCS, Bluefields, Corn Island, Laguna de Perlas.
+
+---
+
+### 3.5 Módulo de Evaluación Clínica del Climaterio (Escala MRS - OMS)
+* **5 Etapas Fisiológicas (STRAW+10)**: Premenopausia, Perimenopausia Temprana, Perimenopausia Tardía, Menopausia Fisiológica y Postmenopausia.
+* **Escala MRS**: 11 ítems distribuidos en 3 subescalas (Somática /16, Psicológica /16, Urogenital /12) con cálculo de severidad clínica (*Leve, Moderada, Severa*).
+
+---
+
+### 3.6 Módulo de Plan de Parto Familiar Comunitario y Control Prenatal
+* **Plan de Parto MINSA**: Registro de semana programada de traslado a Casa Materna (Semana 32 - 36), medio de transporte (ambulancia, panga, carreta, vehículo), acompañante responsable y partera comunitaria asignada.
+* **Controles Prenatales**: Registro de presión arterial sistólica/diastólica, peso, altura uterina, Frecuencia Cardíaca Fetal (FCF) y suplementación de hierro/ácido fólico.
+
+---
+
+### 3.7 Módulo de Analítica y Detección de Anomalías (`/api/insights`)
 
 #### `GET /api/insights`
 Calcula correlaciones de salud, variabilidad de ciclo (desviación típica), interacción sueño-estrés y alertas obstétricas preventivas.

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Search, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { X, Search, Check, Sparkles } from 'lucide-react';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import TagPill from './TagPill';
 import WaterTrackerWidget from './WaterTrackerWidget';
 import WeightTrackerWidget from './WeightTrackerWidget';
@@ -50,22 +52,21 @@ export default function SymptomLoggingSheet({
 }: SymptomLoggingSheetProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Lock body scroll when symptom sheet is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const handlePrevDay = () => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() - 1);
-    onDateChange(d.toISOString().split('T')[0]);
-  };
-
-  const handleNextDay = () => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() + 1);
-    onDateChange(d.toISOString().split('T')[0]);
-  };
-
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-6 bg-slate-950/70 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-6 bg-slate-950/75 backdrop-blur-md animate-fade-in overscroll-contain">
       <div className="bg-slate-50 w-full max-w-2xl h-[88vh] max-h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up border border-slate-200/80">
         
         {/* Drag handle & Header */}
@@ -80,28 +81,14 @@ export default function SymptomLoggingSheet({
             <X className="w-5 h-5" />
           </button>
 
-          {/* Date Selector */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={handlePrevDay}
-              className="p-1 rounded-full text-slate-500 hover:bg-slate-100 cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <div className="text-center">
-              <span className="text-sm font-bold text-slate-900 block">
-                {selectedDate === new Date().toISOString().split('T')[0] ? 'Hoy' : selectedDate}
-              </span>
-              <span className="text-[10px] text-slate-400 font-medium">Registro de síntomas</span>
-            </div>
-
-            <button
-              onClick={handleNextDay}
-              className="p-1 rounded-full text-slate-500 hover:bg-slate-100 cursor-pointer"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          {/* Clean Today Date Header */}
+          <div className="text-center">
+            <span className="text-sm font-black text-slate-900 block capitalize">
+              Hoy — {format(new Date(), "d 'de' MMMM", { locale: es })}
+            </span>
+            <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">
+              Bitácora diaria de bienestar
+            </span>
           </div>
 
           <button

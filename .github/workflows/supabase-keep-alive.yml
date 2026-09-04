@@ -1,0 +1,31 @@
+name: Supabase Keep-Alive Ping
+
+on:
+  schedule:
+    # Runs every 3 days at 04:00 UTC (keeps the free-tier database active)
+    - cron: '0 4 */3 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  keep-alive:
+    name: Ping Supabase REST API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keep-Alive Request
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://wjietprjbfngjatbxhhp.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqaWV0cHJqYmZuZ2phdGJ4aGhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA3NzksImV4cCI6MjEwNDA2Njc3OX0.LNbHa7AmuBspD-8eC2Yal3ZeZo3I45iR4wLM3uBQcy0' }}
+        run: |
+          echo "Executing scheduled heartbeat to prevent Supabase inactivity pause..."
+          if [ -n "$SUPABASE_ANON_KEY" ]; then
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+              "${SUPABASE_URL}/rest/v1/maternal_houses?select=count" \
+              -H "apikey: ${SUPABASE_ANON_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+            echo "Supabase Healthcheck Response: HTTP $HTTP_STATUS"
+          else
+            # Public root ping fallback
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${SUPABASE_URL}")
+            echo "Supabase Public Ping Response: HTTP $HTTP_STATUS"
+          fi
+          echo "Heartbeat completed successfully. Database activity refreshed."

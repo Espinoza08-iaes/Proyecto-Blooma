@@ -11,7 +11,7 @@
   <a href="https://hackathonicaragua.com.ni/"><img src="https://img.shields.io/badge/Hackathon_Nicaragua-2026-blueviolet?style=flat-square" alt="Hackathon Nicaragua 2026"></a>
   <img src="https://img.shields.io/badge/Categoria-Aficionado-orange?style=flat-square" alt="Categoría Aficionado">
   <img src="https://img.shields.io/badge/Tematica-Salud--AF-teal?style=flat-square" alt="Temática Salud AF">
-  <a href="https://proyecto-blooma.vercel.app/"><img src="https://img.shields.io/badge/Despliegue-Vercel_Edge-black?style=flat-square&logo=vercel" alt="Despliegue Vercel"></a>
+  <a href="https://proyecto-blooma.vercel.app/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Despliegue-Vercel_Edge-black?style=flat-square&logo=vercel" alt="Despliegue Vercel"></a>
   <img src="https://img.shields.io/badge/Licencia-MIT-green?style=flat-square" alt="Licencia MIT">
 </p>
 
@@ -19,7 +19,9 @@
 
 ## 1. Resumen Ejecutivo del Proyecto
 
-**Blooma** (del término en inglés *"bloom"*: florecer y desarrollarse plenamente) es una Aplicación Web Progresiva (PWA) de salud femenina concebida bajo el paradigma **Local-First**: el sistema es 100% operativo sin conexión a internet, garantiza privacidad absoluta al no depender de servidores centralizados de terceros para el uso diario, y vincula a la mujer directamente con la red comunitaria de salud y las **Casas Maternas del Ministerio de Salud (MINSA)** de Nicaragua.
+**Blooma** (del término en inglés *"bloom"*: florecer y desarrollarse plenamente) es una Aplicación Web Progresiva (PWA) de salud femenina concebida bajo el paradigma **Local-First** y diseñada para **todas las mujeres de Nicaragua sin distinción de origen, etnia, nivel de conectividad o lengua materna**. 
+
+El sistema opera **100% desconectado de internet**, garantiza privacidad absoluta al no depender de servidores centralizados para el uso diario, e incorpora **inclusión lingüística territorial nativa** (*Español Comunitario*, *Miskitu* de la RACCN e *Inglés Criollo / Creole* de la RACCS), **geolocalización y cálculo de proximidad Haversine 100% offline** hacia la red de **Casas Maternas y Hospitales de Referencia con Quirófano / Código Rojo del Ministerio de Salud (MINSA)**, y un seguimiento clínico integral que abarca desde la menarquía hasta la postmenopausia avanzada.
 
 ---
 
@@ -30,15 +32,27 @@ A diferencia de las herramientas convencionales de ciclo fijo, Blooma adapta su 
 | 1. Seguir mi Ciclo | 2. Planificar Embarazo | 3. Monitorear Embarazo | 4. Gestionar Menopausia |
 | :---: | :---: | :---: | :---: |
 | <img src="entregables_hackathon/assets/01_dashboard_hero_dial.png" width="170" alt="Seguir mi Ciclo" /> | <img src="entregables_hackathon/assets/23_planificacion_fertilidad_mobile.png" width="170" alt="Planificar Embarazo" /> | <img src="entregables_hackathon/assets/07_embarazo_fetal_dial.png" width="170" alt="Monitorear Embarazo" /> | <img src="entregables_hackathon/assets/15_menopausia_bienestar_dial_mobile.png" width="170" alt="Gestionar Menopausia" /> |
-| **Monitoreo Adaptativo**<br>Cálculo de confianza algorítmica (85%) y curvas hormonales. | **Ventana de Concepción**<br>Probabilidad diaria (90%), test B-hCG y moco fértil. | **Salud Gestacional**<br>Desarrollo semana 18, signos de alarma y Casas Maternas. | **Climaterio y Bienestar**<br>Confort térmico (76/100), registro de bochornos y TCC. |
+| **Monitoreo Adaptativo**<br>Cálculo de confianza algorítmica (85%) y curvas hormonales. | **Ventana de Concepción**<br>Probabilidad diaria (90%), test B-hCG y moco fértil. | **Salud Gestacional**<br>Semana 18, Plan de Parto MINSA, pataditas y Casas Maternas. | **Climaterio STRAW+10**<br>5 Fases clínicas, Escala MRS OMS, sofocos y TCC. |
+
+---
+
+## 3. Inclusión Territorial Multi-Étnica y Universalidad
+
+Nicaragua es un país multiétnico, multilingüe e intercultural. Blooma elimina las barreras idiomáticas y de conectividad mediante:
+* **Traducción Nativa en 3 Lenguas Territoriales**:
+  * **Español Nacional / Comunitario**: Lenguaje accesible adaptado a la terminología cotidiana del país.
+  * **Miskitu (*Miskitu Yapu*)**: Cobertura prioritaria para las comunidades de la Costa Caribe Norte (RACCN), Río Coco, Waspam y Bilwi.
+  * **Nicaraguan Creole English**: Cobertura para la Costa Caribe Sur (RACCS), Bluefields, Laguna de Perlas y Corn Island.
+* **Alertas Obstétricas en Lengua Originaria**: Señales de peligro (*Tala takan / Sangrado*, *Duku saura / Cefalea severa*, *Tawan / Fiebre alta*, *Kuhbi aukan apu / Disminución de pataditas*) traducidas para una reacción comunitaria inmediata.
+* **Geolocalización Haversine 100% Offline**: Cálculo instantáneo en kilómetros y metros hacia los 25 hospitales departamentales y Casas Maternas (*Upla Nani Baiki Sakanka*) sin requerir saldo ni paquetes de datos.
 
 ---
 
 ## 3. Acceso al Entorno en Producción y Credenciales
 
-* **Aplicación Web en Producción (Vercel Edge):** [https://proyecto-blooma.vercel.app/](https://proyecto-blooma.vercel.app/)
-* **Video Pitch Oficial (60 Segundos):** [Ver en YouTube Shorts](https://youtube.com/shorts/qLHfupRCO-Q?si=O0pgQD1246XFiipS)
-* **Tablero de Trabajo Kanban:** [GitHub Projects - Proyecto Blooma](https://github.com/users/Espinoza08-iaes/projects/2)
+* **Aplicación Web en Producción (Vercel Edge):** <a href="https://proyecto-blooma.vercel.app/" target="_blank" rel="noopener noreferrer">https://proyecto-blooma.vercel.app/</a>
+* **Video Pitch Oficial (60 Segundos):** <a href="https://youtube.com/shorts/qLHfupRCO-Q?si=O0pgQD1246XFiipS" target="_blank" rel="noopener noreferrer">Ver en YouTube Shorts</a>
+* **Tablero de Trabajo Kanban:** <a href="https://github.com/users/Espinoza08-iaes/projects/2" target="_blank" rel="noopener noreferrer">GitHub Projects - Proyecto Blooma</a>
 * **Credenciales de Demostración para Evaluadores:**
   * Usuario de prueba: `evaluadorhack@gmail.com`
   * Contraseña de prueba: `HN26_Evaluador2026!`
@@ -108,12 +122,15 @@ graph TD
     end
 ```
 
-### Innovaciones Técnicas del Ecosistema
-1. **Local-First por Defecto:** Los datos sensibles residen exclusivamente en el dispositivo mediante IndexedDB y Dexie.js. La sincronización a la nube es voluntaria.
-2. **Triaje Obstétrico Norma Técnica Nº 011 (MINSA):** Clasificación algorítmica de signos de alarma que canaliza a la gestante hacia la Casa Materna más cercana en menos de 1 minuto.
-3. **Telemetría de Reloj Inteligente (Wearable Sync):** Integración con sensores corporales de bajo costo por Web Bluetooth para lectura nocturna de temperatura basal, pulso en reposo y HRV.
-4. **Privacidad contra Violencia Digital (IPV):** Acceso protegido por PIN de 4 dígitos, modo discreto con camuflaje de términos y borrado seguro de datos en cascada.
-5. **Simulador Fisiológico Hormonal:** Representación matemática interactiva de las curvas de estrógeno y progesterona a lo largo del ciclo.
+### Innovaciones Técnicas y de Impacto Comunitario
+1. **Inclusión Lingüística Multi-Étnica:** Soporte nativo para *Miskitu* (RACCN), *Creole English* (RACCS) y *Español Comunitario*, democratizando el acceso a la salud materna para toda mujer nicaragüense sin distinción geográfica ni cultural.
+2. **Geolocalización Haversine 100% Offline:** Cálculo instantáneo de proximidad a Casas Maternas (*Upla Nani Baiki Sakanka*) y Hospitales con Quirófano Obstétrico activo 24h en los 15 departamentos y 2 regiones autónomas, sin consumir datos móviles.
+3. **Local-First por Defecto:** Los datos sensibles residen exclusivamente en el dispositivo mediante IndexedDB y Dexie.js (versión 5). La sincronización a la nube (Supabase PostgreSQL RLS) es 100% voluntaria y cifrada.
+4. **Triaje Obstétrico y Plan de Parto Familiar Comunitario (MINSA):** Alerta preventiva en la Semana 32 (8° mes), evaluación de señales de peligro (Código Rojo/Amarillo) y logística de traslado seguro (ambulancia, panga, carreta, vehículo).
+5. **Profundidad Clínica en Climaterio (STRAW+10 y Escala MRS):** Superación del modelo binario mediante 5 etapas fisiológicas del climaterio y test estandarizado de la OMS (somático, psicológico y urogenital).
+6. **Telemetría de Reloj y Anillo Inteligente (Wearable Sync):** Integración con sensores corporales por Web Bluetooth / Health Connect para lectura nocturna de temperatura basal, pulso en reposo y HRV.
+7. **Privacidad contra Violencia Digital (IPV):** Acceso protegido por PIN de 4 dígitos, modo discreto con camuflaje de términos y borrado seguro de datos en cascada.
+8. **Simulador Fisiológico Hormonal:** Representación matemática interactiva de las curvas de estrógeno y progesterona a lo largo del ciclo.
 
 ---
 
@@ -141,17 +158,20 @@ La carpeta [entregables_hackathon/](entregables_hackathon/) contiene la document
   * `04_PROPUESTA_VALOR_Y_CANALES.md` — Value Proposition Canvas y canales digitales/comunitarios.
   * `05_OBJETIVOS_SMART_CRONOGRAMA.md` — 4 Metas SMART cuantificables y diagrama de Gantt.
   * `06_PLAN_FINANCIERO_PRESUPUESTO.md` — Estructura de costos, presupuesto y sostenibilidad B2G.
-* **pdf/ (PDFs de Evaluación Compilados)**
-  * `DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf` (Documento Maestro Integral)
-  * `DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf` (Formulario Oficial de Ética y Transparencia IA)
-  * `01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf`
-  * `02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf`
-  * `03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf`
-  * `PLANTILLA_BUSINESS_MODEL_CANVAS.pdf`
-  * `PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf`
-  * `PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf`
-  * `PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf`
-  * `PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf`
+* **pdf/ (Dossier Oficial Clasificado por Disciplinas)**
+  * **01_diseno/**
+    * `02_MANUAL_DE_IDENTIDAD_Y_FICHAS_GRAFICAS.pdf` — Manual de Marca oficial en alta definición.
+    * `PLANTILLA_FICHA_COLOR_Y_ACCESIBILIDAD_WCAG.pdf` — Ficha de paletas y matrices de contraste WCAG AA.
+  * **02_marketing/**
+    * `03_PLAN_DE_NEGOCIO_Y_MARKETING.pdf` — Plan integral de producto y comercialización B2G.
+    * `PLANTILLA_BUSINESS_MODEL_CANVAS.pdf` — Matriz Lean Canvas de 9 bloques.
+    * `PLANTILLA_BUYER_PERSONAS_Y_EMPATIA.pdf` — Perfiles de usuarias y mapas de empatía.
+    * `PLANTILLA_OBJETIVOS_SMART_Y_CRONOGRAMA.pdf` — 4 Metas SMART y diagrama de tiempos.
+    * `PLANTILLA_PLAN_FINANCIERO_Y_PRESUPUESTO.pdf` — Estructura de costos y presupuesto.
+  * **03_desarrollo/**
+    * `01_DOSSIER_TECNICO_Y_ARQUITECTURA.pdf` — Arquitectura de software, diagramas y endpoints.
+    * `DOSSIER_GENERAL_HACKATHON_BLOOMA_2026.pdf` — Documento Maestro Integral de todas las disciplinas.
+    * `DECLARACION_USO_RESPONSABLE_IA_HACKATHON_2026.pdf` — Formulario oficial de ética y transparencia IA.
 
 ---
 

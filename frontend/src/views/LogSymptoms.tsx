@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { db, type DailyLog } from '../db/db';
-import { Smile, AlertCircle, Calendar, Thermometer, Flame, Moon, Compass, MessageSquare, Heart, Activity, Shield, Scale, Pill } from 'lucide-react';
+import { db, type DailyLog, type Profile } from '../db/db';
+import { Activity, Heart, Shield, Calendar, Smile, Thermometer, Scale, Pill, Flame, Moon, Compass, MessageSquare } from 'lucide-react';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface LogSymptomsProps {
   stage: 'cycle' | 'pregnancy' | 'menopause';
+  profile?: Profile | null;
   onSave: () => void;
 }
 
@@ -16,7 +18,8 @@ const moods = [
   { val: 'tired', label: 'Cansada', icon: '😴' },
 ] as const;
 
-export default function LogSymptoms({ stage: initialStage, onSave }: LogSymptomsProps) {
+export default function LogSymptoms({ stage: initialStage, profile, onSave }: LogSymptomsProps) {
+  const { t } = useTranslation(profile);
   const [activeStage, setActiveStage] = useState<'cycle' | 'pregnancy' | 'menopause'>(initialStage);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [mood, setMood] = useState<DailyLog['mood']>(undefined);

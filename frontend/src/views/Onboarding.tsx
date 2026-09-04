@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { db, type Profile } from '../db/db';
-import { Shield, Sparkles, Heart, Activity, Check } from 'lucide-react';
+import { Shield, Sparkles, Heart, Activity, Check, Languages, Globe, MapPin } from 'lucide-react';
+import { CLIMACTERIC_STAGES, type ClimactericStage } from '../services/menopauseService';
+import { NICARAGUA_DEPARTMENTS } from '../services/locationService';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface OnboardingProps {
   onComplete: (profile: Profile) => void;
@@ -9,6 +12,11 @@ interface OnboardingProps {
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [stage, setStage] = useState<'cycle' | 'pregnancy' | 'menopause'>('cycle');
+  const [language, setLanguage] = useState<'es' | 'miskito' | 'creole'>('es');
+  const { t } = useTranslation(language);
+  const [climactericStage, setClimactericStage] = useState<ClimactericStage>('early_perimenopause');
+  const [department, setDepartment] = useState('Managua');
+  const [municipality, setMunicipality] = useState('Managua');
   
   // Cycle details
   const [avgCycleLength, setAvgCycleLength] = useState(28);
@@ -39,9 +47,17 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleSubmit = async () => {
+    const deptCoords = NICARAGUA_DEPARTMENTS.find(d => d.name === department)?.capitalCoords;
+
     let profileData: Profile = {
       id: 'main',
       stage,
+      language,
+      department,
+      municipality,
+      latitude: deptCoords?.latitude,
+      longitude: deptCoords?.longitude,
+      climactericStage: stage === 'menopause' ? climactericStage : undefined,
       isPinEnabled: pinEnabled && pinCode.length === 4,
       pinCode: pinEnabled && pinCode.length === 4 ? pinCode : undefined,
       isDiscreteMode: false,
@@ -53,7 +69,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       menopauseStartYear: stage === 'menopause' ? new Date().getFullYear().toString() : undefined
     };
 
-    // Save profile to database
+    // Save profile to local database (Dexie / IndexedDB)
     await db.profile.put(profileData);
 
     // Seed initial cycle if cycle stage chosen
@@ -61,7 +77,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       const duration = avgCycleLength;
       const start = new Date(lastPeriodDate);
       const end = new Date(start);
-      end.setDate(start.getDate() + 5); // Default 5 days period
+      end.setDate(start.getDate() + 5);
 
       await db.cycles.add({
         startDate: lastPeriodDate,
@@ -95,53 +111,122 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
       <div className="glass rounded-3xl p-8 shadow-xl border border-brand-earth-100 flex-1 flex flex-col justify-between animate-pop-in">
         
-        {/* STEP 1: Bienvenida */}
+        {/* STEP 1: Bienvenida e Idioma */}
         {step === 1 && (
-          <div className="space-y-6 flex-1 flex flex-col justify-center animate-page-enter">
-            <div className="mx-auto bg-brand-teal-50 h-20 w-20 rounded-2xl flex items-center justify-center text-brand-teal-600 shadow-inner animate-pulse-soft">
-              <Sparkles className="h-10 w-10" />
+          <div className="space-y-5 flex-1 flex flex-col justify-center animate-page-enter">
+            <div className="mx-auto bg-brand-teal-50 h-16 w-16 rounded-2xl flex items-center justify-center text-brand-teal-600 shadow-inner animate-pulse-soft">
+              <Sparkles className="h-8 w-8" />
             </div>
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-extrabold tracking-tight text-brand-earth-900 leading-none">
-                Proyecto Blooma
+
+            <div className="text-center space-y-1">
+              <h1 className="text-2xl font-extrabold tracking-tight text-brand-earth-900 leading-none">
+                {t.onboarding.welcomeTitle}
               </h1>
-              <p className="text-sm text-brand-earth-600">
-                Tu compañera de salud íntima, privada y local-first.
+              <p className="text-xs text-brand-earth-600 font-medium">
+                {t.onboarding.welcomeSubtitle}
               </p>
             </div>
-            <div className="bg-brand-earth-50 rounded-2xl p-4 border border-brand-earth-100 text-sm leading-relaxed text-brand-earth-700 hover:shadow-inner transition-shadow duration-300">
-              Blooma está diseñada para funcionar <strong>completamente offline</strong>. Tus datos médicos sensibles nunca abandonan tu dispositivo, protegiéndote contra la vigilancia de datos íntimos.
+
+            {/* Language Selector */}
+            <div className="space-y-2 pt-1">
+              <label className="block text-[11px] font-black uppercase text-slate-500 tracking-wider text-center">
+                {t.onboarding.chooseLanguageTitle}:
+              </label>
+              
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'es', flag: '🇳🇮', label: 'Español', desc: 'Nacional' },
+                  { id: 'miskito', flag: '🌿', label: 'Miskitu', desc: 'RACCN' },
+                  { id: 'creole', flag: '🌊', label: 'Creole', desc: 'RACCS' }
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setLanguage(item.id as any)}
+                    className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                      language === item.id
+                        ? 'bg-teal-600 text-white border-teal-600 shadow-md scale-102'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-lg">{item.flag}</span>
+                    <span className="text-xs font-black mt-0.5">{item.label}</span>
+                    <span className={`text-[9px] ${language === item.id ? 'text-teal-100' : 'text-slate-400'}`}>
+                      {item.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Territorial Location Selector */}
+            <div className="space-y-2 pt-1">
+              <label className="block text-[11px] font-black uppercase text-slate-500 tracking-wider text-center flex items-center justify-center space-x-1">
+                <MapPin className="w-3.5 h-3.5 text-rose-500 inline mr-1" />
+                <span>{t.onboarding.territoryTitle}:</span>
+              </label>
+
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={department}
+                  onChange={e => {
+                    const newDept = e.target.value;
+                    setDepartment(newDept);
+                    const firstMuni = NICARAGUA_DEPARTMENTS.find(d => d.name === newDept)?.municipalities[0] || newDept;
+                    setMunicipality(firstMuni);
+                  }}
+                  className="p-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-teal-400 cursor-pointer"
+                >
+                  {NICARAGUA_DEPARTMENTS.map(d => (
+                    <option key={d.id} value={d.name}>{d.name}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={municipality}
+                  onChange={e => setMunicipality(e.target.value)}
+                  className="p-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-teal-400 cursor-pointer"
+                >
+                  {NICARAGUA_DEPARTMENTS.find(d => d.name === department)?.municipalities.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="bg-brand-earth-50 rounded-2xl p-3 border border-brand-earth-100 text-[11px] leading-relaxed text-brand-earth-700">
+              Blooma funciona <strong>100% {t.nav.offlineMode}</strong>.
             </div>
           </div>
         )}
 
         {/* STEP 2: Selección de etapa */}
         {step === 2 && (
-          <div className="space-y-6 flex-1 animate-page-enter">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-brand-earth-900">¿En qué etapa te encuentras?</h2>
-              <p className="text-sm text-brand-earth-600">Personalizaremos la aplicación para tus necesidades.</p>
+          <div className="space-y-5 flex-1 animate-page-enter">
+            <div className="text-center space-y-1">
+              <h2 className="text-xl font-black text-brand-earth-900">{t.onboarding.chooseGoalTitle}</h2>
+              <p className="text-xs text-brand-earth-600">{t.onboarding.chooseGoalSubtitle}</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {/* Opción Menstruación */}
               <button
                 type="button"
                 onClick={() => setStage('cycle')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
+                className={`flex items-center p-3.5 rounded-2xl border text-left transition-all duration-300 ${
                   stage === 'cycle'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center mr-3.5 ${
                   stage === 'cycle' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
-                  <Activity className="h-6 w-6" />
+                  <Activity className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-brand-earth-900">Ciclo Menstrual</h3>
-                  <p className="text-xs text-brand-earth-600">Monitoreo del periodo, días fértiles y síntomas asociados.</p>
+                  <h3 className="font-bold text-sm text-brand-earth-900">{t.settings.cycleStageName}</h3>
+                  <p className="text-[11px] text-brand-earth-600">{t.settings.cycleStageDesc}</p>
                 </div>
               </button>
 
@@ -149,20 +234,20 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 type="button"
                 onClick={() => setStage('pregnancy')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
+                className={`flex items-center p-3.5 rounded-2xl border text-left transition-all duration-300 ${
                   stage === 'pregnancy'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center mr-3.5 ${
                   stage === 'pregnancy' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
-                  <Heart className="h-6 w-6" />
+                  <Heart className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-brand-earth-900">Embarazo</h3>
-                  <p className="text-xs text-brand-earth-600">Triaje de síntomas de riesgo, control de semanas y Casas Maternas.</p>
+                  <h3 className="font-bold text-sm text-brand-earth-900">{t.settings.pregnancyStageName}</h3>
+                  <p className="text-[11px] text-brand-earth-600">{t.settings.pregnancyStageDesc}</p>
                 </div>
               </button>
 
@@ -170,20 +255,20 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               <button
                 type="button"
                 onClick={() => setStage('menopause')}
-                className={`flex items-center p-4 rounded-2xl border text-left transition-all duration-300 active-press ${
+                className={`flex items-center p-3.5 rounded-2xl border text-left transition-all duration-300 ${
                   stage === 'menopause'
                     ? 'border-brand-teal-500 bg-brand-teal-50/50 shadow-md ring-2 ring-brand-teal-200'
-                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50 card-hover'
+                    : 'border-brand-earth-200 bg-white hover:bg-brand-earth-50/50'
                 }`}
               >
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mr-4 transition-colors ${
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center mr-3.5 ${
                   stage === 'menopause' ? 'bg-brand-teal-100 text-brand-teal-600' : 'bg-brand-earth-100 text-brand-earth-600'
                 }`}>
-                  <Shield className="h-6 w-6" />
+                  <Shield className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-brand-earth-900">Menopausia y Climaterio</h3>
-                  <p className="text-xs text-brand-earth-600">Registro de sofocos, bienestar óseo y apoyo cognitivo-conductual.</p>
+                  <h3 className="font-bold text-sm text-brand-earth-900">{t.settings.menopauseStageName}</h3>
+                  <p className="text-[11px] text-brand-earth-600">{t.settings.menopauseStageDesc}</p>
                 </div>
               </button>
             </div>
@@ -192,32 +277,32 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* STEP 3: Configuración específica */}
         {step === 3 && (
-          <div className="space-y-6 flex-1 animate-page-enter">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-brand-earth-900">Cuéntanos un poco más</h2>
-              <p className="text-sm text-brand-earth-600">Estos datos nos ayudan a calibrar tus estimaciones.</p>
+          <div className="space-y-5 flex-1 animate-page-enter">
+            <div className="text-center space-y-1">
+              <h2 className="text-xl font-black text-brand-earth-900">{t.onboarding.step3Title}</h2>
+              <p className="text-xs text-brand-earth-600">{t.onboarding.chooseGoalSubtitle}</p>
             </div>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
-                  Tu edad (Opcional)
+                  {t.dashboards.ageLabel}
                 </label>
                 <input
                   type="number"
-                  placeholder="Ej. 28"
+                  placeholder="Ej. 30"
                   value={age || ''}
                   onChange={(e) => setAge(e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white text-xs"
                 />
               </div>
 
               {/* Ajustes de ciclo */}
               {stage === 'cycle' && (
                 <>
-                  <div className="animate-fade-in-up delay-75">
+                  <div>
                     <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
-                      ¿Cuándo empezó tu último periodo?
+                      {t.dashboards.logPeriodAction}
                     </label>
                     <input
                       type="date"
@@ -225,12 +310,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       min={new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                       max={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setLastPeriodDate(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-brand-earth-200 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 bg-white text-xs"
                     />
                   </div>
-                  <div className="animate-fade-in-up delay-150">
+                  <div>
                     <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
-                      Duración promedio del ciclo ({avgCycleLength} días)
+                      {t.dashboards.cycleLengthCardTitle} ({avgCycleLength} {t.dashboards.daysUnit})
                     </label>
                     <input
                       type="range"
@@ -240,10 +325,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       onChange={(e) => setAvgCycleLength(Number(e.target.value))}
                       className="w-full accent-brand-teal-500 cursor-pointer"
                     />
-                    <div className="flex justify-between text-xs text-brand-earth-500 px-1">
-                      <span>20 días</span>
-                      <span className="font-bold text-brand-teal-700">Regular (28)</span>
-                      <span>45 días</span>
+                    <div className="flex justify-between text-[10px] text-brand-earth-500 px-1">
+                      <span>20 {t.dashboards.daysUnit}</span>
+                      <span className="font-bold text-brand-teal-700">{t.dashboards.regularBadge} (28)</span>
+                      <span>45 {t.dashboards.daysUnit}</span>
                     </div>
                   </div>
                 </>
@@ -251,9 +336,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
               {/* Ajustes de embarazo */}
               {stage === 'pregnancy' && (
-                <div className="animate-fade-in-up delay-75">
+                <div>
                   <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
-                    ¿En qué semana de embarazo te encuentras? ({gestationWeek} semanas)
+                    {t.dashboards.pregnancyWeekBadge} ({gestationWeek})
                   </label>
                   <input
                     type="range"
@@ -263,32 +348,43 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     onChange={(e) => setGestationWeek(Number(e.target.value))}
                     className="w-full accent-brand-teal-500 cursor-pointer"
                   />
-                  <div className="flex justify-between text-xs text-brand-earth-500 px-1">
-                    <span>1 semana</span>
+                  <div className="flex justify-between text-[10px] text-brand-earth-500 px-1">
+                    <span>Semana 1</span>
                     <span className="font-bold text-brand-teal-700">Semana {gestationWeek}</span>
-                    <span>42 semanas</span>
+                    <span>Semana 42</span>
                   </div>
                 </div>
               )}
 
-              {/* Ajustes de menopausia */}
+              {/* Ajustes de menopausia con 5 fases STRAW+10 */}
               {stage === 'menopause' && (
-                <div className="animate-fade-in-up delay-75">
-                  <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider mb-1">
-                    ¿Cuántos meses llevas sin periodo menstrual regular? ({menopauseMonths} meses)
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-brand-earth-700 uppercase tracking-wider">
+                    {t.settings.climactericSectionTitle}:
                   </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="60"
-                    value={menopauseMonths}
-                    onChange={(e) => setMenopauseMonths(Number(e.target.value))}
-                    className="w-full accent-brand-teal-500 cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-brand-earth-500 px-1">
-                    <span>1 mes</span>
-                    <span className="font-bold text-brand-teal-700">{menopauseMonths} meses</span>
-                    <span>5 años (60)</span>
+                  
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                    {(Object.keys(CLIMACTERIC_STAGES) as ClimactericStage[]).map(key => {
+                      const stg = CLIMACTERIC_STAGES[key];
+                      const isSel = climactericStage === key;
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setClimactericStage(key)}
+                          className={`w-full p-2.5 rounded-xl text-left border text-xs transition-all cursor-pointer ${
+                            isSel
+                              ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+                              : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="font-black block text-xs">{stg.title}</span>
+                          <span className={`text-[10px] block ${isSel ? 'text-teal-100' : 'text-slate-400'}`}>
+                            {stg.ageRange} • {stg.shortBadge}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -298,30 +394,30 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* STEP 4: Seguridad y Privacidad */}
         {step === 4 && (
-          <div className="space-y-6 flex-1 animate-page-enter">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-brand-earth-900 flex items-center justify-center gap-2">
-                <Shield className="h-6 w-6 text-brand-teal-600 animate-pulse-soft" />
-                Seguridad e Intimidad
+          <div className="space-y-5 flex-1 animate-page-enter">
+            <div className="text-center space-y-1">
+              <h2 className="text-xl font-black text-brand-earth-900 flex items-center justify-center gap-2">
+                <Shield className="h-5 w-5 text-brand-teal-600" />
+                {t.onboarding.securitySetupTitle}
               </h2>
-              <p className="text-sm text-brand-earth-600">
-                Tus datos son personales y confidenciales.
+              <p className="text-xs text-brand-earth-600">
+                {t.onboarding.securitySetupSubtitle}
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Bloqueo PIN */}
-              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3 shadow-sm hover:shadow transition-shadow duration-300">
+              <div className="border border-brand-earth-100 rounded-2xl p-3.5 bg-white space-y-2.5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-sm text-brand-earth-900">Bloqueo por PIN de acceso</h3>
-                    <p className="text-xs text-brand-earth-600">Protege tu app de miradas no deseadas.</p>
+                    <h3 className="font-bold text-xs text-brand-earth-900">{t.settings.securityTitle}</h3>
+                    <p className="text-[10px] text-brand-earth-600">{t.settings.securityDesc}</p>
                   </div>
                   <input
                     type="checkbox"
                     checked={pinEnabled}
                     onChange={(e) => setPinEnabled(e.target.checked)}
-                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer transition-all"
+                    className="h-4 w-4 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer"
                   />
                 </div>
                 {pinEnabled && (
@@ -331,28 +427,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     pattern="\d*"
                     value={pinCode}
                     onChange={(e) => handlePinInput(e.target.value)}
-                    placeholder="Ingresa un PIN de 4 dígitos"
-                    className="w-full px-4 py-3 rounded-xl border border-brand-earth-200 text-center tracking-widest text-lg font-bold bg-brand-earth-50 focus:outline-none focus:ring-2 focus:ring-brand-teal-300 animate-fade-in-up"
+                    placeholder={t.settings.pinCodeLabel}
+                    className="w-full px-4 py-2 rounded-xl border border-brand-earth-200 text-center tracking-widest text-base font-bold bg-brand-earth-50 focus:outline-none focus:ring-2 focus:ring-brand-teal-300"
                   />
                 )}
               </div>
 
               {/* Sincronización en la nube */}
-              <div className="border border-brand-earth-100 rounded-2xl p-4 bg-white space-y-3 shadow-sm hover:shadow transition-shadow duration-300">
+              <div className="border border-brand-earth-100 rounded-2xl p-3.5 bg-white space-y-2 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-bold text-sm text-brand-earth-900">Sincronización en la nube (Opt-in)</h3>
-                    <p className="text-xs text-brand-earth-600">Tus datos se guardan en la nube cifrados (Requiere Supabase).</p>
+                    <h3 className="font-bold text-xs text-brand-earth-900">{t.settings.cloudBackupTitle}</h3>
+                    <p className="text-[10px] text-brand-earth-600">{t.settings.cloudBackupDesc}</p>
                   </div>
                   <input
                     type="checkbox"
                     checked={optInSync}
                     onChange={(e) => setOptInSync(e.target.checked)}
-                    className="h-5 w-5 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer transition-all"
+                    className="h-4 w-4 rounded text-brand-teal-600 focus:ring-brand-teal-400 accent-brand-teal-500 cursor-pointer"
                   />
-                </div>
-                <div className="text-[11px] text-brand-earth-500 bg-brand-earth-50 p-2 rounded-lg leading-relaxed">
-                  <strong>Recomendado:</strong> Mantenerlo desactivado para una privacidad 100% local. Si decides activarlo, tus datos se guardan usando políticas estrictas de seguridad (RLS).
                 </div>
               </div>
             </div>
@@ -360,14 +453,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         )}
 
         {/* Botones inferiores */}
-        <div className="mt-8 flex items-center justify-between gap-4">
+        <div className="mt-6 flex items-center justify-between gap-4">
           {step > 1 ? (
             <button
               type="button"
               onClick={handleBack}
-              className="px-6 py-3 rounded-xl border border-brand-earth-200 text-brand-earth-700 font-medium hover:bg-brand-earth-100/50 active-press transition-all duration-200"
+              className="px-5 py-2.5 rounded-xl border border-brand-earth-200 text-brand-earth-700 font-bold text-xs hover:bg-brand-earth-100/50 transition-all cursor-pointer"
             >
-              Atrás
+              {t.nav.back}
             </button>
           ) : (
             <div />
@@ -377,13 +470,13 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             type="button"
             onClick={handleNext}
             disabled={step === 4 && pinEnabled && pinCode.length !== 4}
-            className={`px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg active-press transition-all text-white ${
+            className={`px-7 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all text-white cursor-pointer ${
               step === 4 && pinEnabled && pinCode.length !== 4
                 ? 'bg-brand-earth-300 cursor-not-allowed'
                 : 'bg-brand-teal-600 hover:bg-brand-teal-700'
             }`}
           >
-            {step === 4 ? 'Empezar' : 'Siguiente'}
+            {step === 4 ? t.onboarding.startAppBtn : t.nav.next}
           </button>
         </div>
 

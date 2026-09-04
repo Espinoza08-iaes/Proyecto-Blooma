@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db, type Cycle, type DailyLog, type TriageRecord, type KickSession, type ContractionLog, type HotFlashLog } from '../db/db';
+import { db, type Profile, type Cycle, type DailyLog, type TriageRecord, type KickSession, type ContractionLog, type HotFlashLog } from '../db/db';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar, BarChart2, ShieldAlert, Sparkles, Heart, Activity, Shield, Flame, Timer, ChevronRight, X } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -7,11 +7,15 @@ import { es } from 'date-fns/locale';
 
 import DottedTimelineBar from '../components/DottedTimelineBar';
 
+import { useTranslation } from '../i18n/useTranslation';
+
 interface HistoryProps {
   stage: 'cycle' | 'pregnancy' | 'menopause';
+  profile?: Profile | null;
 }
 
-export default function History({ stage: initialStage }: HistoryProps) {
+export default function History({ stage: initialStage, profile }: HistoryProps) {
+  const { t } = useTranslation(profile);
   const [activeStage, setActiveStage] = useState<'cycle' | 'pregnancy' | 'menopause'>(initialStage);
   const [cycles, setCycles] = useState<Cycle[]>([]);
   const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);

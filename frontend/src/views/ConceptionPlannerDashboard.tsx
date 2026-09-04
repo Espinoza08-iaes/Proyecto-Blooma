@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { db, type Profile, type DailyLog } from '../db/db';
-import { Sparkles, Calendar as CalendarIcon, Heart, Zap, ShieldCheck, Activity, Check, Thermometer, TestTube, HelpCircle } from 'lucide-react';
-import { format, addDays, differenceInDays } from 'date-fns';
+import { Sparkles, Calendar as CalendarIcon, Heart, Zap, ShieldCheck, Activity, Check, Thermometer, TestTube, HelpCircle, X } from 'lucide-react';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import FloatingActionDock from '../components/FloatingActionDock';
 import MetricSummaryCard from '../components/MetricSummaryCard';
 import MedicalGuidelineCard from '../components/MedicalGuidelineCard';
 import WearableSyncCard from '../components/WearableSyncCard';
+import WearableTelemetryModal from '../components/WearableTelemetryModal';
 import HormoneSimulatorCard from '../components/HormoneSimulatorCard';
 import SymptomLoggingSheet from '../components/SymptomLoggingSheet';
-import FullCalendarModal from '../components/FullCalendarModal';
 import { calculateFertilityWindow, CONCEPTION_GUIDELINES } from '../services/conceptionService';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface ConceptionPlannerDashboardProps {
   profile: Profile | null;
@@ -20,9 +22,10 @@ interface ConceptionPlannerDashboardProps {
 }
 
 export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOpenCalendar }: ConceptionPlannerDashboardProps) {
+  const { t } = useTranslation(profile);
   const [cycleDay, setCycleDay] = useState(14);
   const [isLoggingSheetOpen, setIsLoggingSheetOpen] = useState(false);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isWearableModalOpen, setIsWearableModalOpen] = useState(false);
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
 
   // Conception Questionnaire Form state
@@ -36,6 +39,18 @@ export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOp
   // Daily log state for fertility metrics
   const [selectedLogDate, setSelectedLogDate] = useState(new Date().toISOString().split('T')[0]);
   const [activeLog, setActiveLog] = useState<DailyLog | undefined>(undefined);
+
+  // Lock body scroll when any modal in conception planner is open
+  useEffect(() => {
+    const isAnyModalOpen = showQuestionnaire || isLoggingSheetOpen || isWearableModalOpen;
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [showQuestionnaire, isLoggingSheetOpen, isWearableModalOpen]);
 
   useEffect(() => {
     async function loadData() {
@@ -120,9 +135,10 @@ export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOp
       {/* Floating 3-Button Action Dock */}
       <FloatingActionDock
         stage="cycle"
+        profile={profile}
         onLogPeriod={() => setIsLoggingSheetOpen(true)}
         onLogSymptoms={() => setIsLoggingSheetOpen(true)}
-        onWearableSync={() => {}}
+        onWearableSync={() => setIsWearableModalOpen(true)}
       />
 
       {/* Pregnancy Test Countdown Card */}
@@ -185,14 +201,20 @@ export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOp
       {/* Telemetry Sync Card */}
       <WearableSyncCard />
 
-      {/* Conception Questionnaire Modal */}
-      {showQuestionnaire && (
-        <div className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4">
-            <div className="flex justify-between items-center">
+      {/* PORTALIZED MODALS */}
+
+      {/* 1. Conception Questionnaire Modal */}
+      {showQuestionnaire && createPortal(
+        <div className="fixed inset-0 z-[99999] bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in overscroll-contain">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scale-up relative">
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <h3 className="text-base font-extrabold text-slate-900">Plan de Concepción Personalizado</h3>
-              <button onClick={() => setShowQuestionnaire(false)} className="p-1 text-slate-400">
-                <Check className="w-5 h-5 text-emerald-600" />
+              <button
+                type="button"
+                onClick={() => setShowQuestionnaire(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -202,7 +224,7 @@ export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOp
                 <select
                   value={questionnaireData.monthsTrying}
                   onChange={e => setQuestionnaireData(prev => ({ ...prev, monthsTrying: e.target.value }))}
-                  className="w-full p-2.5 rounded-xl bg-slate-100 font-semibold text-slate-800"
+                  className="w-full p-2.5 rounded-xl bg-slate-100 font-semibold text-slate-800 cursor-pointer"
                 >
                   <option value="< 3 meses">Menos de 3 meses</option>
                   <option value="3-6 meses">Entre 3 y 6 meses</option>
@@ -233,18 +255,26 @@ export default function ConceptionPlannerDashboard({ profile, onOpenDrawer, onOp
             </div>
 
             <button
+              type="button"
               onClick={() => setShowQuestionnaire(false)}
-              className="w-full py-3 rounded-full bg-rose-500 text-white font-extrabold text-xs shadow-md shadow-rose-200 hover:bg-rose-600 cursor-pointer"
+              className="w-full py-3 rounded-full bg-rose-500 text-white font-extrabold text-xs shadow-md shadow-rose-200 hover:bg-rose-600 transition-all cursor-pointer"
             >
               Guardar y Optimizar Algoritmo
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
+      {/* 2. Wearable Telemetry Modal */}
+      <WearableTelemetryModal
+        isOpen={isWearableModalOpen}
+        onClose={() => setIsWearableModalOpen(false)}
+        stage="cycle"
+        conceptionMode={true}
+      />
 
-
-      {/* Symptom Logging Sheet Modal */}
+      {/* 3. Symptom Logging Sheet Modal */}
       <SymptomLoggingSheet
         isOpen={isLoggingSheetOpen}
         onClose={() => setIsLoggingSheetOpen(false)}

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Heart, Lock, Cloud, Sparkles, HelpCircle, ChevronRight, Watch, EyeOff, BarChart2, Shield, RefreshCw, Key } from 'lucide-react';
+import { X, User, Heart, Lock, Cloud, Sparkles, HelpCircle, ChevronRight, Watch, EyeOff, BarChart2, Shield, RefreshCw, Key, Globe, Languages, MapPin, Navigation, Compass } from 'lucide-react';
 import { db, type Profile } from '../db/db';
 import { apiRegister, apiLogin } from '../db/supabase';
 import BloomaLogo from './BloomaLogo';
-
 import WearableTelemetryModal from './WearableTelemetryModal';
+import MinsaSupportModal from './MinsaSupportModal';
+import { useTranslation } from '../i18n/useTranslation';
+import { CLIMACTERIC_STAGES, type ClimactericStage } from '../services/menopauseService';
+import { NICARAGUA_DEPARTMENTS, getCurrentCoordinates, calculateDistanceKm } from '../services/locationService';
 
 interface ProfileSettingsDrawerProps {
   isOpen: boolean;
@@ -21,6 +24,8 @@ export default function ProfileSettingsDrawer({
   onProfileUpdate,
   onResetApp
 }: ProfileSettingsDrawerProps) {
+  const [selectedLanguage, setSelectedLanguage] = useState<'es' | 'miskito' | 'creole'>('es');
+  const { t } = useTranslation(selectedLanguage);
   const [activeStage, setActiveStage] = useState<'cycle' | 'pregnancy' | 'menopause'>('cycle');
   const [conceptionMode, setConceptionMode] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(false);
@@ -28,9 +33,143 @@ export default function ProfileSettingsDrawer({
   const [pinCode, setPinCode] = useState('1234');
   const [discreteMode, setDiscreteMode] = useState(false);
   const [selectedLogo, setSelectedLogo] = useState<'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun'>('lotus');
+  const [climactericStage, setClimactericStage] = useState<ClimactericStage>('early_perimenopause');
+  const [selectedDept, setSelectedDept] = useState('Managua');
+  const [selectedMuni, setSelectedMuni] = useState('Managua');
+  const [isGpsLoading, setIsGpsLoading] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState('');
+
   const PRESET_AVATARS = ['🌸', '🦊', '👑', '🦋', '🌿', '👶', '🌙', '💃', '🍉', '🧘‍♀️', '🦄', '🌷', '🌺', '🎨', '✨'];
   const [selectedEmoji, setSelectedEmoji] = useState('blooma');
   const [customAvatar, setCustomAvatar] = useState<string | null>(null);
+
+  // Email / Password Form state
+  const [accountEmail, setAccountEmail] = useState('');
+  const [accountPassword, setAccountPassword] = useState('');
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [authStatusMsg, setAuthStatusMsg] = useState('');
+  const [linkedAccount, setLinkedAccount] = useState<string | null>(null);
+
+  // Modals state
+  const [isWearableModalOpen, setIsWearableModalOpen] = useState(false);
+  const [isMinsaModalOpen, setIsMinsaModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setActiveStage(profile.stage || 'cycle');
+      setConceptionMode(profile.conceptionMode || false);
+      setSyncEnabled(profile.optInSync || false);
+      setPinEnabled(profile.isPinEnabled || false);
+      setPinCode(profile.pinCode || '');
+      setDiscreteMode(profile.isDiscreteMode || false);
+      setSelectedLogo(profile.logoVariant || 'lotus');
+      setSelectedLanguage(profile.language || 'es');
+      setClimactericStage(profile.climactericStage || 'early_perimenopause');
+      setSelectedDept(profile.department || 'Managua');
+      setSelectedMuni(profile.municipality || 'Managua');
+      setSelectedEmoji(profile.appIcon || 'blooma');
+      setCustomAvatar(profile.customAvatarUrl || null);
+    }
+  }, [profile]);
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  const handleDepartmentChange = async (deptName: string) => {
+    setSelectedDept(deptName);
+    const dept = NICARAGUA_DEPARTMENTS.find(d => d.name === deptName);
+    const firstMuni = dept?.municipalities[0] || deptName;
+    setSelectedMuni(firstMuni);
+    if (profile) {
+      const updated: Profile = {
+        ...profile,
+        department: deptName,
+        municipality: firstMuni,
+        latitude: dept?.capitalCoords.latitude,
+        longitude: dept?.capitalCoords.longitude
+      };
+      await db.profile.put(updated, 'main');
+      onProfileUpdate(updated);
+    }
+  };
+
+  const handleMunicipalityChange = async (muniName: string) => {
+    setSelectedMuni(muniName);
+    if (profile) {
+      const updated: Profile = {
+        ...profile,
+        municipality: muniName
+      };
+      await db.profile.put(updated, 'main');
+      onProfileUpdate(updated);
+    }
+  };
+
+  const handleDetectGps = async () => {
+    setIsGpsLoading(true);
+    setGpsStatus('Localizando coordenadas por satélite...');
+    const coords = await getCurrentCoordinates();
+    if (coords) {
+      let closestDept = NICARAGUA_DEPARTMENTS[0];
+      let minDistance = Infinity;
+      for (const d of NICARAGUA_DEPARTMENTS) {
+        const dist = calculateDistanceKm(coords.latitude, coords.longitude, d.capitalCoords.latitude, d.capitalCoords.longitude);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestDept = d;
+        }
+      }
+      setSelectedDept(closestDept.name);
+      setSelectedMuni(closestDept.municipalities[0]);
+      setGpsStatus(`✅ GPS: ${coords.latitude.toFixed(4)}, ${coords.longitude.toFixed(4)} (${closestDept.name})`);
+      if (profile) {
+        const updated: Profile = {
+          ...profile,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          department: closestDept.name,
+          municipality: closestDept.municipalities[0]
+        };
+        await db.profile.put(updated, 'main');
+        onProfileUpdate(updated);
+      }
+    } else {
+      setGpsStatus('⚠️ Permiso GPS denegado o satélite no disponible. Selecciona tu departamento manualmente.');
+    }
+    setIsGpsLoading(false);
+  };
+
+  const handleLanguageChange = async (lang: 'es' | 'miskito' | 'creole') => {
+    setSelectedLanguage(lang);
+    if (profile) {
+      const updated: Profile = {
+        ...profile,
+        language: lang
+      };
+      await db.profile.put(updated, 'main');
+      onProfileUpdate(updated);
+    }
+  };
+
+  const handleLogoChange = async (logo: 'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun') => {
+    setSelectedLogo(logo);
+    if (profile) {
+      const updated: Profile = {
+        ...profile,
+        logoVariant: logo
+      };
+      await db.profile.put(updated, 'main');
+      onProfileUpdate(updated);
+    }
+  };
 
   const handleSelectPresetAvatar = async (emoji: string) => {
     setSelectedEmoji(emoji);
@@ -46,53 +185,19 @@ export default function ProfileSettingsDrawer({
     }
   };
 
-  // Wearable Telemetry modal state
-  const [isWearableModalOpen, setIsWearableModalOpen] = useState(false);
-
-  // Account Linking Form state
-  const [accountEmail, setAccountEmail] = useState('');
-  const [accountPassword, setAccountPassword] = useState('');
-  const [linkedAccount, setLinkedAccount] = useState<string | null>(null);
-  const [authStatusMsg, setAuthStatusMsg] = useState('');
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
-
-  useEffect(() => {
-    if (profile) {
-      setActiveStage(profile.stage || 'cycle');
-      setConceptionMode(profile.conceptionMode || false);
-      setSyncEnabled(profile.optInSync || false);
-      setPinEnabled(profile.isPinEnabled || false);
-      setPinCode(profile.pinCode || '1234');
-      setDiscreteMode(profile.isDiscreteMode || false);
-      setSelectedEmoji(profile.appIcon || 'blooma');
-      setSelectedLogo(profile.logoVariant || 'lotus');
-      setCustomAvatar(profile.customAvatarUrl || null);
-    }
-  }, [profile]);
-
-  const handleLogoChange = async (variant: 'lotus' | 'sprout' | 'flower' | 'butterfly' | 'sun') => {
-    setSelectedLogo(variant);
-    if (profile) {
-      const updated: Profile = {
-        ...profile,
-        logoVariant: variant
-      };
-      await db.profile.put(updated, 'main');
-      onProfileUpdate(updated);
-    }
-  };
-
   const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64Url = reader.result as string;
-        setCustomAvatar(base64Url);
+        const base64String = reader.result as string;
+        setCustomAvatar(base64String);
+        setSelectedEmoji('custom');
         if (profile) {
           const updated: Profile = {
             ...profile,
-            customAvatarUrl: base64Url
+            customAvatarUrl: base64String,
+            appIcon: 'custom'
           };
           await db.profile.put(updated, 'main');
           onProfileUpdate(updated);
@@ -164,24 +269,14 @@ export default function ProfileSettingsDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-gradient-to-br from-rose-100/80 via-purple-50/50 to-slate-100 flex flex-col w-screen h-screen min-h-screen overflow-y-auto animate-fade-in relative overflow-x-hidden">
+    <div className="fixed inset-0 z-[99999] bg-[#FFF9F9] flex flex-col w-screen h-screen min-h-screen overflow-y-auto animate-fade-in relative overflow-x-hidden overscroll-contain">
       
-      {/* Background ambient mesh spheres for desktop symmetry */}
+      {/* Background ambient mesh spheres */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-10%] left-[-5%] w-[45vw] h-[45vw] max-w-[600px] max-h-[600px] bg-gradient-to-br from-rose-300/40 via-pink-200/30 to-transparent rounded-full blur-3xl animate-float-slow" />
         <div className="absolute top-[5%] right-[-5%] w-[45vw] h-[45vw] max-w-[600px] max-h-[600px] bg-gradient-to-br from-purple-300/40 via-indigo-200/30 to-transparent rounded-full blur-3xl animate-float-reverse" />
         <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] bg-gradient-to-tr from-amber-200/40 via-rose-200/30 to-transparent rounded-full blur-3xl animate-float-slow" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] bg-gradient-to-tr from-teal-200/40 via-emerald-100/30 to-transparent rounded-full blur-3xl animate-float-reverse" />
-
-        {/* Organic Floral SVG Watermarks */}
-        <svg className="absolute top-16 left-10 w-72 h-72 text-rose-300/25 mix-blend-multiply hidden xl:block" viewBox="0 0 200 200" fill="currentColor">
-          <path d="M100,20 C120,60 160,80 200,100 C160,120 120,140 100,180 C80,140 40,120 0,100 C40,80 80,60 100,20 Z" />
-        </svg>
-
-        <svg className="absolute bottom-16 right-10 w-80 h-80 text-purple-300/25 mix-blend-multiply hidden xl:block" viewBox="0 0 200 200" fill="currentColor">
-          <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6" />
-          <path d="M100,30 C130,70 170,100 100,170 C30,100 70,70 100,30 Z" />
-        </svg>
       </div>
 
       {/* Top Bar Header */}
@@ -194,12 +289,14 @@ export default function ProfileSettingsDrawer({
           <X className="w-6 h-6" />
         </button>
 
-        <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">Ajustes y Cuenta Blooma</h2>
+        <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
+          {t.settings.title}
+        </h2>
 
         <div className="w-8" />
       </div>
 
-      {/* Content Container Card (Glassmorphic Container on Laptop & Mobile) */}
+      {/* Content Container Card */}
       <div className="max-w-xl w-full mx-auto my-4 p-6 sm:p-8 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-slate-200/80 space-y-6 flex-1 mb-20">
         
         {/* Profile Card Header with Custom Avatar Upload */}
@@ -215,7 +312,7 @@ export default function ProfileSettingsDrawer({
               )}
             </div>
             <div className="absolute inset-0 bg-slate-900/40 rounded-full flex items-center justify-center text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-              Cambiar
+              {t.settings.changeAvatar}
             </div>
             <input
               type="file"
@@ -226,12 +323,12 @@ export default function ProfileSettingsDrawer({
           </label>
 
           <div>
-            <h3 className="text-base font-extrabold text-slate-900">Usuario de Blooma</h3>
+            <h3 className="text-base font-extrabold text-slate-900">{t.settings.userTitle}</h3>
             <span className="text-xs font-bold text-rose-600 block">
-              {linkedAccount ? `Cuenta: ${linkedAccount}` : 'Modo Privado Off-grid (Sin cuenta requerida)'}
+              {linkedAccount ? `${t.settings.linkedAccount}: ${linkedAccount}` : t.settings.privateMode}
             </span>
             <label className="text-[10px] font-extrabold text-indigo-600 hover:text-indigo-800 cursor-pointer block mt-0.5">
-              📷 Cargar Foto de Perfil Personalizada
+              📷 {t.settings.customAvatar}
               <input
                 type="file"
                 accept="image/*"
@@ -242,14 +339,115 @@ export default function ProfileSettingsDrawer({
           </div>
         </div>
 
+        {/* SECTION: LENGUAJE E INCLUSIÓN TERRITORIAL (NICARAGUA MULTI-ÉTNICA) */}
+        <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-50 border border-emerald-100 space-y-3">
+          <div className="flex items-center space-x-2 text-emerald-700">
+            <Languages className="w-5 h-5" />
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+              {t.settings.languageSectionTitle}
+            </h3>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            {t.settings.languageSectionDesc}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+            {[
+              { id: 'es', flag: '🇳🇮', name: 'Español', sub: 'Nicaragua / Comunitario' },
+              { id: 'miskito', flag: '🌿', name: 'Miskitu', sub: 'Costa Caribe Norte (RACCN)' },
+              { id: 'creole', flag: '🌊', name: 'Creole', sub: 'Costa Caribe Sur (RACCS)' }
+            ].map(lang => (
+              <button
+                key={lang.id}
+                type="button"
+                onClick={() => handleLanguageChange(lang.id as any)}
+                className={`p-3 rounded-2xl border text-left flex flex-col items-center justify-center transition-all cursor-pointer ${
+                  selectedLanguage === lang.id
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200 scale-102'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className="text-xl mb-1">{lang.flag}</span>
+                <span className="text-xs font-black text-center">{lang.name}</span>
+                <span className={`text-[9px] text-center mt-0.5 line-clamp-1 ${selectedLanguage === lang.id ? 'text-emerald-100' : 'text-slate-400'}`}>
+                  {lang.sub}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION: UBICACIÓN Y RED DE SALUD MINSA */}
+        <div className="p-5 rounded-3xl bg-gradient-to-br from-amber-50 via-rose-50 to-slate-50 border border-amber-200/80 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-amber-800">
+              <MapPin className="w-5 h-5 text-rose-500" />
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                {t.settings.locationSectionTitle}
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={handleDetectGps}
+              disabled={isGpsLoading}
+              className="px-3 py-1.5 rounded-xl bg-white text-rose-600 border border-rose-200 font-extrabold text-[11px] shadow-xs hover:bg-rose-50 transition-all flex items-center space-x-1.5 cursor-pointer"
+            >
+              <Navigation className={`w-3.5 h-3.5 ${isGpsLoading ? 'animate-spin' : ''}`} />
+              <span>{isGpsLoading ? t.settings.detectingGps : t.settings.getGpsBtn}</span>
+            </button>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            {t.settings.locationSectionDesc}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-500 block">
+                {t.settings.departmentLabel}
+              </label>
+              <select
+                value={selectedDept}
+                onChange={e => handleDepartmentChange(e.target.value)}
+                className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-rose-400 cursor-pointer"
+              >
+                {NICARAGUA_DEPARTMENTS.map(d => (
+                  <option key={d.id} value={d.name}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-500 block">
+                {t.settings.municipalityLabel}
+              </label>
+              <select
+                value={selectedMuni}
+                onChange={e => handleMunicipalityChange(e.target.value)}
+                className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-rose-400 cursor-pointer"
+              >
+                {NICARAGUA_DEPARTMENTS.find(d => d.name === selectedDept)?.municipalities.map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {gpsStatus && (
+            <p className="text-[11px] font-semibold text-slate-700 bg-white/70 p-2 rounded-xl border border-amber-100">
+              {gpsStatus}
+            </p>
+          )}
+        </div>
+
         {/* PRESET AVATAR ICON SELECTION GALLERY */}
         <div className="p-4 rounded-3xl bg-pink-50/50 border border-pink-100 space-y-2">
           <span className="text-[10px] font-black uppercase text-pink-700 tracking-wider block">
-            Colección de Iconos de Perfil Predefinidos:
+            {t.settings.avatarCollectionTitle}
           </span>
 
           <div className="flex items-center space-x-2 overflow-x-auto py-1 scrollbar-none">
-            {/* 1. Isotipo Oficial Blooma (Floral B) */}
             <button
               type="button"
               onClick={() => handleSelectPresetAvatar('blooma')}
@@ -280,28 +478,30 @@ export default function ProfileSettingsDrawer({
           </div>
         </div>
 
-        {/* SECTION 1: EMAIL PASSWORD ACCOUNT BACKUP */}
+        {/* SECTION: EMAIL PASSWORD ACCOUNT BACKUP */}
         <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3">
           <div className="flex items-center space-x-2 text-rose-600">
             <Cloud className="w-5 h-5" />
-            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Vincular Cuenta (Respaldo en Nube)</h3>
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+              {t.settings.cloudBackupTitle}
+            </h3>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Vincula un correo y contraseña para respaldar de forma cifrada tus ciclos en Supabase o continúa disfrutando del almacenamiento 100% privado en tu dispositivo.
+            {t.settings.cloudBackupDesc}
           </p>
 
           <div className="pt-2 space-y-2">
             <input
               type="email"
-              placeholder="Correo electrónico"
+              placeholder={t.settings.emailLabel}
               value={accountEmail}
               onChange={e => setAccountEmail(e.target.value)}
               className="w-full p-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800"
             />
             <input
               type="password"
-              placeholder="Contraseña de acceso (mín. 6 caracteres)"
+              placeholder={t.settings.passwordLabel}
               value={accountPassword}
               onChange={e => setAccountPassword(e.target.value)}
               className="w-full p-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800"
@@ -315,10 +515,10 @@ export default function ProfileSettingsDrawer({
               {isAuthLoading ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Procesando cifrado seguro...</span>
+                  <span>{t.nav.loading}</span>
                 </>
               ) : (
-                <span>Registrar / Vincular Cuenta</span>
+                <span>{t.settings.linkAccountBtn}</span>
               )}
             </button>
           </div>
@@ -328,15 +528,17 @@ export default function ProfileSettingsDrawer({
           )}
         </div>
 
-        {/* SECTION 2: ACCESS SECURITY MODE (WITH OR WITHOUT PASSWORD/PIN) */}
+        {/* SECTION: ACCESS SECURITY MODE */}
         <div className="p-5 rounded-3xl bg-rose-50/60 border border-rose-100 space-y-3">
           <div className="flex items-center space-x-2 text-rose-600">
             <Lock className="w-5 h-5" />
-            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Modo de Acceso a la Aplicación</h3>
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+              {t.settings.securityTitle}
+            </h3>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Decide si deseas solicitar un PIN / Contraseña de acceso cada vez que se abra la app o permitir entrada directa sin contraseña.
+            {t.settings.securityDesc}
           </p>
 
           <div className="grid grid-cols-2 gap-3 pt-1">
@@ -350,7 +552,7 @@ export default function ProfileSettingsDrawer({
               }`}
             >
               <span className="text-lg">🔓</span>
-              <span>Sin Contraseña (Entrada Directa)</span>
+              <span>{t.settings.noPinDirect}</span>
             </button>
 
             <button
@@ -363,14 +565,16 @@ export default function ProfileSettingsDrawer({
               }`}
             >
               <span className="text-lg">🔒</span>
-              <span>Con PIN / Contraseña de 4 dígitos</span>
+              <span>{t.settings.withPinOption}</span>
             </button>
           </div>
         </div>
 
-        {/* SECTION 3: MI OBJETIVO PRINCIPAL */}
+        {/* SECTION: MI OBJETIVO PRINCIPAL */}
         <div className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">MI OBJETIVO PRINCIPAL:</h3>
+          <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+            {t.settings.stageGoalTitle}:
+          </h3>
 
           <div className="grid grid-cols-1 gap-2.5">
             <button
@@ -384,9 +588,9 @@ export default function ProfileSettingsDrawer({
             >
               <span className="text-xl">🌸</span>
               <div>
-                <span className="block font-black">Seguir mi ciclo</span>
+                <span className="block font-black">{t.settings.cycleStageName}</span>
                 <span className={`text-[10px] font-medium block ${activeStage === 'cycle' && !conceptionMode ? 'text-rose-100' : 'text-slate-400'}`}>
-                  Monitoreo de periodo y predicciones habituales
+                  {t.settings.cycleStageDesc}
                 </span>
               </div>
             </button>
@@ -402,9 +606,9 @@ export default function ProfileSettingsDrawer({
             >
               <span className="text-xl">👶</span>
               <div>
-                <span className="block font-black">Planificar embarazo</span>
+                <span className="block font-black">{t.settings.conceptionStageName}</span>
                 <span className={`text-[10px] font-medium block ${activeStage === 'cycle' && conceptionMode ? 'text-pink-100' : 'text-slate-400'}`}>
-                  Ventana fértil, ovulación e indicadores de concepción
+                  {t.settings.conceptionStageDesc}
                 </span>
               </div>
             </button>
@@ -420,9 +624,9 @@ export default function ProfileSettingsDrawer({
             >
               <span className="text-xl">🤰</span>
               <div>
-                <span className="block font-black">Monitorear embarazo</span>
+                <span className="block font-black">{t.settings.pregnancyStageName}</span>
                 <span className={`text-[10px] font-medium block ${activeStage === 'pregnancy' ? 'text-amber-100' : 'text-slate-400'}`}>
-                  Semanas gestacionales y triaje obstétrico MINSA
+                  {t.settings.pregnancyStageDesc}
                 </span>
               </div>
             </button>
@@ -438,24 +642,76 @@ export default function ProfileSettingsDrawer({
             >
               <span className="text-xl">🌿</span>
               <div>
-                <span className="block font-black">Gestionar menopausia</span>
+                <span className="block font-black">{t.settings.menopauseStageName}</span>
                 <span className={`text-[10px] font-medium block ${activeStage === 'menopause' ? 'text-teal-100' : 'text-slate-400'}`}>
-                  Sofocos, TCC y confort térmico
+                  {t.settings.menopauseStageDesc}
                 </span>
               </div>
             </button>
           </div>
         </div>
 
+        {/* IF MENOPAUSE SELECTED: 5 CLIMACTERIC STAGES SELECTOR */}
+        {activeStage === 'menopause' && (
+          <div className="p-5 rounded-3xl bg-teal-50/70 border border-teal-100 space-y-3">
+            <div className="flex items-center space-x-2 text-teal-800">
+              <Sparkles className="w-5 h-5" />
+              <h3 className="text-xs font-black uppercase tracking-wider">
+                {t.settings.climactericSectionTitle}
+              </h3>
+            </div>
+
+            <p className="text-xs text-slate-600">
+              {t.settings.climactericSectionDesc}
+            </p>
+
+            <div className="space-y-2 pt-1">
+              {(Object.keys(CLIMACTERIC_STAGES) as ClimactericStage[]).map(key => {
+                const stg = CLIMACTERIC_STAGES[key];
+                const isSelected = climactericStage === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      setClimactericStage(key);
+                      if (profile) {
+                        const updated: Profile = { ...profile, climactericStage: key };
+                        db.profile.put(updated, 'main');
+                        onProfileUpdate(updated);
+                      }
+                    }}
+                    className={`w-full p-3 rounded-2xl text-left border transition-all cursor-pointer flex items-center justify-between ${
+                      isSelected
+                        ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+                        : 'bg-white text-slate-800 border-slate-200 hover:bg-teal-50/50'
+                    }`}
+                  >
+                    <div>
+                      <span className="text-xs font-extrabold block">{stg.title}</span>
+                      <span className={`text-[10px] block ${isSelected ? 'text-teal-100' : 'text-slate-400'}`}>
+                        {stg.ageRange} • {stg.shortBadge}
+                      </span>
+                    </div>
+                    {isSelected && <span className="text-base font-black">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* SECTION: BRAND LOGO & APP ICON SELECTOR */}
         <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3">
           <div className="flex items-center space-x-2 text-teal-700">
             <Sparkles className="w-5 h-5" />
-            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">Identificador y Logo de la Aplicación</h3>
+            <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+              {t.settings.logoSectionTitle}
+            </h3>
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed">
-            Personaliza el isotipo de Blooma mostrado en la aplicación:
+            {t.settings.logoSectionDesc}
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
@@ -494,8 +750,8 @@ export default function ProfileSettingsDrawer({
             <div className="flex items-center space-x-3">
               <Watch className="w-5 h-5 text-indigo-600" />
               <div>
-                <h4 className="text-xs font-bold text-slate-900">Reloj y Anillo Inteligente</h4>
-                <span className="text-[10px] text-slate-400">Android Health Connect, Apple HealthKit o BLE</span>
+                <h4 className="text-xs font-bold text-slate-900">{t.settings.smartwatchOption}</h4>
+                <span className="text-[10px] text-slate-400">{t.settings.smartwatchSub}</span>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -504,7 +760,7 @@ export default function ProfileSettingsDrawer({
           <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer">
             <div className="flex items-center space-x-3">
               <EyeOff className="w-5 h-5 text-slate-700" />
-              <span className="text-xs font-bold text-slate-900">Modo discreto (Ocultar términos explícitos)</span>
+              <span className="text-xs font-bold text-slate-900">{t.settings.discreetModeOption}</span>
             </div>
             <input
               type="checkbox"
@@ -521,10 +777,13 @@ export default function ProfileSettingsDrawer({
             />
           </div>
 
-          <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer">
+          <div
+            onClick={() => setIsMinsaModalOpen(true)}
+            className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer"
+          >
             <div className="flex items-center space-x-3">
               <HelpCircle className="w-5 h-5 text-slate-700" />
-              <span className="text-xs font-bold text-slate-900">Ayuda y Soporte Clínico MINSA</span>
+              <span className="text-xs font-bold text-slate-900">{t.settings.minsaSupportOption}</span>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400" />
           </div>
@@ -541,7 +800,7 @@ export default function ProfileSettingsDrawer({
             }}
             className="text-xs font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"
           >
-            Reiniciar aplicación y datos locales
+            {t.settings.resetAppBtn}
           </button>
         </div>
 
@@ -553,6 +812,13 @@ export default function ProfileSettingsDrawer({
         onClose={() => setIsWearableModalOpen(false)}
         stage={activeStage}
         conceptionMode={conceptionMode}
+      />
+
+      {/* MINSA Institutional Support & Emergency Lines Modal */}
+      <MinsaSupportModal
+        isOpen={isMinsaModalOpen}
+        onClose={() => setIsMinsaModalOpen(false)}
+        profile={profile}
       />
     </div>
   );
